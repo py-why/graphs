@@ -1,5 +1,4 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![CircleCI](https://circleci.com/gh/pywhy/graphs/tree/main.svg?style=svg)](https://circleci.com/gh/pywhy/graphs/tree/main)
 [![Main](https://github.com/pywhy/graphs/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/pywhy/graphs/actions/workflows/main.yml)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![codecov](https://codecov.io/gh/pywhy/graphs/branch/main/graph/badge.svg?token=H1reh7Qwf4)](https://codecov.io/gh/pywhy/graphs)
