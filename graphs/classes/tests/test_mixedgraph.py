@@ -9,5 +9,5 @@ from networkx.classes.tests.test_graph import TestGraph as _TestGraph
 
 
 # class BaseMixedEdgeGraphTester(BaseGraphTester):
-    # def test_edges(self):
-        # pass
+# def test_edges(self):
+# pass

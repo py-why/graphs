@@ -1,10 +1,10 @@
 from networkx.algorithms import d_separated
-from networkx import DiGraph
 
 from graphs import MixedEdgeGraph
 from .convert import bidirected_to_unobserved_confounder
 
-def m_separated(G, x, y, z, bidirected_edge_name='bidirected', directed_edge_name='directed'):
+
+def m_separated(G, x, y, z, bidirected_edge_name="bidirected", directed_edge_name="directed"):
     """Check m-separation among 'x' and 'y' given 'z' in mixed-edge causal graph G.
 
     This algorithm wraps ``networkx.algorithms.d_separated``, but
@@ -42,18 +42,31 @@ def m_separated(G, x, y, z, bidirected_edge_name='bidirected', directed_edge_nam
     ``ADMG`` is not represented.
     """
     if not isinstance(G, MixedEdgeGraph):
-        raise RuntimeError('m-separation should only be run on a MixedEdgeGraph. If '
-                           'you have a directed graph, use "d_separated" function instead.')
+        raise RuntimeError(
+            "m-separation should only be run on a MixedEdgeGraph. If "
+            'you have a directed graph, use "d_separated" function instead.'
+        )
+    if any(
+        edge_type not in [bidirected_edge_name, directed_edge_name] for edge_type in G.edge_types
+    ):
+        raise RuntimeError(
+            f"m-separation only works on graphs with directed and bidirected edges. "
+            f"Your graph passed in has the following edge types: {G.edge_types}, whereas "
+            f"the function is expecting directed edges named {directed_edge_name} and "
+            f"bidirected edges named {bidirected_edge_name}."
+        )
 
     # get the full graph by converting bidirected edges into latent confounders
     # and keeping the directed edges
-    explicit_G = G.compute_full_graph(to_networkx=True)
+    explicit_G = bidirected_to_unobserved_confounder(G, bidirected_edge_name=bidirected_edge_name)
 
-    bidirected_to_unobserved_confounder(G, )
+    # Convert the graph to a directed graph;
+    # At this point, it should be a valid DAG if the original graph was acyclic
+    explicit_G = explicit_G.to_directed()
 
     # get all unobserved confounders
+    uc_nodes = {node for node, label in explicit_G.nodes(data="label") if label is not None}
 
     # make sure there are always conditioned on the conditioning set
-    z = z.union(G._cond_set)
+    z = z.union(uc_nodes)
     return d_separated(explicit_G, x, y, z)
-
