@@ -36,11 +36,6 @@ jobs:
 
           - python: '3.10'
             task:
-              name: Type check
-              run: mypy ./graphs
-
-          - python: '3.10'
-            task:
               name: Build
               run: |
                 python setup.py check

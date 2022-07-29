@@ -1,6 +1,6 @@
-from functools import cached_property
-from typing import List, Union, Dict
 from copy import deepcopy
+from functools import cached_property
+from typing import Dict, List, Union
 
 import networkx as nx
 from networkx import DiGraph, Graph
@@ -814,7 +814,7 @@ class MixedEdgeGraph:
         """
         if edges is not None:
             if edge_type is None:
-                raise RuntimeError(f"Edge type is undefined.")
+                raise RuntimeError("Edge type is undefined.")
 
             if nodes is not None:
                 self.add_nodes_from(nodes)
