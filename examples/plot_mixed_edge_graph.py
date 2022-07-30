@@ -48,19 +48,26 @@ bidirected_G = Graph(
         ("X", "Y"),
     ]
 )
+directed_G.add_nodes_from(bidirected_G.nodes)
+bidirected_G.add_nodes_from(directed_G.nodes)
 G = MixedEdgeGraph(
     graphs=[directed_G, bidirected_G], edge_types=["directed", "bidirected"], name="IV Graph"
 )
 
 # Compute the multipartite_layout using the "layer" node attribute
-pos = nx.multipartite_layout(G, subset_key="layer")
-
+pos = nx.spring_layout(G)
+print(len(G))
+print(G)
+print(G.edges)
+print(G.nodes)
+print(pos)
 # we can then visualize the mixed-edge graph
 fig, ax = plt.subplots()
-nx.draw_networkx(G, pos=pos, ax=ax)
+nx.draw_networkx(G.get_graphs(edge_type="directed"), pos=pos, ax=ax)
+nx.draw_networkx(G.get_graphs(edge_type="bidirected"), pos=pos, ax=ax)
 ax.set_title("Instrumental Variable Mixed Edge Causal Graph")
 fig.tight_layout()
-plt.show()
+plt.show(block=False)
 
 # %%
 # Mixed Edge Graph Properties
@@ -94,7 +101,7 @@ bidirected_edges = G.get_graphs("bidirected")
 nodes = G.nodes
 assert G.order() == len(G)
 assert len(G) == G.number_of_nodes()
-print(f"{G} has {G.order()} nodes: {nodes}")
+print(f"{G} has nodes: {nodes}")
 
 # If we add a node, then we can query if the new node is there
 print(f"Graph has node A: {G.has_node('A')}")
@@ -114,17 +121,17 @@ print(f"The graph has directed edges: {G.edges['directed']}")
 
 # When querying, adding, or removing an edge, you must specify
 # the edge type.
-assert G.has_edge('X', 'Y', edge_type='directed')
-G.add_edge('Z', 'Y', edge_type='bidirected')
-G.remove_edge('Z', 'Y', edge_type='bidirected')
+assert G.has_edge("X", "Y", edge_type="directed")
+G.add_edge("Z", "Y", edge_type="bidirected")
+G.remove_edge("Z", "Y", edge_type="bidirected")
 
 # Similar to the networkx API, the ``adj`` provides a way to iterate
 # through the nodes and edges, but now over different edge types.
-for edge_type, adj in G.adj:
+for edge_type, adj in G.adj.items():
     print(edge_type)
     print(adj)
 
 # In contrast with the networkx API, a mixed edge graph provides
 # a class method for iterating over all the possible adjacencies
 # of a node (similar to ``neighbors`` function for Graph).
-assert 'Z' in G.adjacencies('X')
+assert "Z" in G.adjacencies("X")
