@@ -17,7 +17,6 @@ import graphs  # noqa: E402
 curdir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(os.path.join(curdir, '..')))
 sys.path.append(os.path.abspath(os.path.join(curdir, '..', 'graphs')))
-sys.path.append(os.path.abspath(os.path.join(curdir, 'sphinxext')))
 
 # -- General configuration ------------------------------------------------
 
@@ -37,10 +36,8 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinx_gallery.gen_gallery',
-    # 'sphinxcontrib.bibtex',
     'numpydoc',
     'sphinx_copybutton',
-    'gh_substitutions',  # custom extension, see sphinxext/gh_substitutions.py
 ]
 
 # configure sphinx-copybutton
