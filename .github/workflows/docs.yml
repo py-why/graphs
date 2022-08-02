@@ -93,7 +93,7 @@ jobs:
       # Build docs
       - name: make html
         run: |
-          cd docs;
+          cd doc;
           make html;
 
       - name: Upload package distribution files

@@ -1,0 +1,23 @@
+
+
+Examples using ``graphs.MixedEdgeGraph.adj``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A MixedEdgeGraph is a graph comprised of a tuple, G = (V, E). The difference compared to the ot...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_mixed_edge_graph_thumb.png
+     :alt: MixedEdgeGraph - Graph with different types of edges
+
+     :ref:`sphx_glr_auto_examples_plot_mixed_edge_graph.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_examples_plot_mixed_edge_graph.py`

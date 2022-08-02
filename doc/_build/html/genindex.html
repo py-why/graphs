@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; Networkx v0.1dev0 documentation</title>
+<script>
+  document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
+</script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+
+
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="_static/style.css" />
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="canonical" href="https://mne.tools/mne-icalabel/stable/index.html" />
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <script type="text/javascript" src="_static/scrollfix.js"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="docsearch:language" content="en">
+
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+    <div class="bd-header-announcement container-fluid" id="banner">
+      
+
+    </div>
+
+    
+    <nav class="bd-header navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
+
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">Networkx v0.1dev0 documentation</p>
+  
+</a>
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="fas fa-bars"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="api.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <div class="dropdown">
+    <button type="button" class="btn btn-primary btn-sm navbar-btn dropdown-toggle" id="dLabelMore" data-toggle="dropdown">
+        vv0.1dev0
+        <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu list-group-flush py-0" aria-labelledby="dLabelMore">
+        <a class="list-group-item list-group-item-action py-1" href="https://mne.tools/mne-icalabel/v0.1/index.html">v0.1 (devel)</a>
+    </div>
+</div>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/py-why/graphs" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="bd-container container-xl">
+      <div class="bd-container__inner row">
+          
+
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="bd-sidebar-primary col-12 col-md-3 bd-sidebar">
+  <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+  </div>
+  <div class="sidebar-end-items">
+  </div>
+</div>
+
+
+          
+
+
+<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
+  
+</div>
+
+
+          
+          
+          <div class="bd-content col-12 col-md-9 col-xl-7">
+              
+              <article class="bd-article" role="main">
+                
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#_"><strong>_</strong></a>
+ | <a href="#A"><strong>A</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ 
+</div>
+<h2 id="_">_</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.__contains__">__contains__() (graphs.MixedEdgeGraph method)</a>
+</li>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.__getitem__">__getitem__() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.__iter__">__iter__() (graphs.MixedEdgeGraph method)</a>
+</li>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.__len__">__len__() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.add_edge">add_edge() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.add_edges_from">add_edges_from() (graphs.MixedEdgeGraph method)</a>
+</li>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.adj">adj() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.clear_edge_types">clear_edge_types() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.copy">copy() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.degree">degree() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.edges">edges() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.get_graphs">get_graphs() (graphs.MixedEdgeGraph method)</a>
+</li>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.graph_attr_dict_factory">graph_attr_dict_factory (graphs.MixedEdgeGraph attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    graphs
+
+      <ul>
+        <li><a href="api.html#module-graphs">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.has_edge">has_edge() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.has_node">has_node() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.is_directed">is_directed() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.is_multigraph">is_multigraph() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph">MixedEdgeGraph (class in graphs)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    module
+
+      <ul>
+        <li><a href="api.html#module-graphs">graphs</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.name">name (graphs.MixedEdgeGraph property)</a>
+</li>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.nbunch_iter">nbunch_iter() (graphs.MixedEdgeGraph method)</a>
+</li>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.node_attr_dict_factory">node_attr_dict_factory (graphs.MixedEdgeGraph attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.node_dict_factory">node_dict_factory (graphs.MixedEdgeGraph attribute)</a>
+</li>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.number_of_edges">number_of_edges() (graphs.MixedEdgeGraph method)</a>
+</li>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.number_of_nodes">number_of_nodes() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.order">order() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.remove_edge">remove_edge() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.remove_edges_from">remove_edges_from() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.subgraph">subgraph() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.to_directed">to_directed() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.to_undirected">to_undirected() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/graphs.MixedEdgeGraph.html#graphs.MixedEdgeGraph.update">update() (graphs.MixedEdgeGraph method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+              </article>
+              
+
+              
+              <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              </footer>
+              
+          </div>
+          
+      </div>
+    </div>
+
+  
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
+
+<footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <p class="copyright">
+    &copy; Copyright 2021-2022. Last updated on 2022-08-02.<br>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br>
+</p>
+  </div>
+  
+</div>
+</footer>
+  </body>
+</html>

@@ -12,13 +12,18 @@ graph that is one of `nx.Graph` or `nx.DiGraph` classes. Each internal graph
 represents one type of edge. 
 
 Semantically a `MixedEdgeGraph` with just one type of edge, is just a normal
-`nx.Graph` or `nx.DiGraph`.
+`nx.Graph` or `nx.DiGraph` and should be converted to its appropriate
+networkx class.
 
 For example, causal graphs typically have two types of edges:
 
 - ``->`` directed edges representing causal relations
 - ``<->`` bidirected edges representing the presence of an unobserved
 confounder.
+
+This would type of mixed-edge graph with two internal graphs: a `nx.DiGraph`
+to represent the directed edges, and a `nx.Graph` to represent the bidirected
+edges.
 """
 
 import matplotlib.pyplot as plt
@@ -115,23 +120,57 @@ print(f"Graph has node A: {G.has_node('A')}")
 # %%
 # Mixed Edge Graph Operations on Edges
 # ------------------------------------
+# Mixed edge graphs are just like normal networkx graph classes,
+# except that they store an internal networkx graph per edge type.
+# As a result, each edge now corresponds to an 'edge_type', which
+# typically must be specified in edge operations for mixed edge graphs.
 
 # Edges: We can query specific edges by type
-print(f"The graph has directed edges: {G.edges['directed']}")
+print(f"The graph has directed edges: {G.edges('directed')}")
+
+# Note these edges correspond to the edges of the internal networkx
+# DiGraph that represents the directed edges
+print(G.get_graphs("directed").edges)
 
 # When querying, adding, or removing an edge, you must specify
-# the edge type.
+# the edge type as well.
+# Here, we can add a new Z <-> Y bidirected edge.
 assert G.has_edge("X", "Y", edge_type="directed")
 G.add_edge("Z", "Y", edge_type="bidirected")
+assert not G.has_edge("Z", "Y", edge_type="directed")
+
+# Now, we can remove the Z <-> Y bidirected edge.
 G.remove_edge("Z", "Y", edge_type="bidirected")
+assert not G.has_edge("Z", "Y", edge_type="bidirected")
+
+# %%
+# Mixed Edge Graph Key Differences
+# --------------------------------
+# Mixed edge graphs implement the standard networkx API, but the
+# ``adj``, ``edges``, and ``degree`` are functions instead of
+# class properties. Moreover, one can specify the edge type.
+
+# Neighbors: Compared to its uni-edge networkx counterparts, a mixed-edge
+# graph has many edge types. We define neighbors as any node with a connection.
+# This is similar to `nx.Graph` where neighbors are any adjacent neighbors.
+assert "Z" in G.neighbors("X")
 
 # Similar to the networkx API, the ``adj`` provides a way to iterate
 # through the nodes and edges, but now over different edge types.
-for edge_type, adj in G.adj.items():
+for edge_type, adj in G.adj().items():
     print(edge_type)
     print(adj)
 
-# In contrast with the networkx API, a mixed edge graph provides
-# a class method for iterating over all the possible adjacencies
-# of a node (similar to ``neighbors`` function for Graph).
-assert "Z" in G.adjacencies("X")
+# If you only want the adjacencies of the directed edges
+print(G.adj(edge_type="directed"))
+
+# Similar to the networkx API, the ``edges`` provides a way to iterate
+# through the edges, but now over different edge types.
+for edge_type, edges in G.edges().items():
+    print(edge_type)
+    print(edges)
+
+# Similar to the networkx API, the ``edges`` provides a way to iterate
+# through the edges, but now over different edge types.
+for node, degrees in G.degree():
+    print(f"{node} with degree: {degrees}")

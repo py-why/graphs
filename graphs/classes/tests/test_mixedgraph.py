@@ -8,7 +8,7 @@ from networkx.utils import edges_equal, graphs_equal, nodes_equal
 from graphs import MixedEdgeGraph
 
 
-class TestMixedEdgeGraph(TestGraph):
+class TestMixedEdgeGraph:
     def setup_method(self):
         self.Graph = MixedEdgeGraph
         self._graph_func = nx.Graph
@@ -33,18 +33,18 @@ class TestMixedEdgeGraph(TestGraph):
         G = self.Graph()
         G.add_edge_type(self._graph_func(), edge_type=edge_type)
         G.add_edge(0, 1, edge_type=edge_type)
-        assert G.adj == {edge_type: {0: {1: {}}, 1: {0: {}}}}
+        assert G.adj() == {edge_type: {0: {1: {}}, 1: {0: {}}}}
         G = self.Graph()
         G.add_edge_type(self._graph_func(), edge_type=edge_type)
         G.add_edge(*(0, 1), edge_type=edge_type)
-        assert G.adj == {edge_type: {0: {1: {}}, 1: {0: {}}}}
+        assert G.adj() == {edge_type: {0: {1: {}}, 1: {0: {}}}}
 
     def test_add_edges_from(self):
         edge_type = "undirected"
         G = self.Graph()
         G.add_edge_type(self._graph_func(), edge_type=edge_type)
         G.add_edges_from([(0, 1), (0, 2, {"weight": 3})], edge_type=edge_type)
-        assert G.adj[edge_type] == {
+        assert G.adj()[edge_type] == {
             0: {1: {}, 2: {"weight": 3}},
             1: {0: {}},
             2: {0: {"weight": 3}},
@@ -54,7 +54,7 @@ class TestMixedEdgeGraph(TestGraph):
         G.add_edges_from(
             [(0, 1), (0, 2, {"weight": 3}), (1, 2, {"data": 4})], data=2, edge_type=edge_type
         )
-        assert G.adj[edge_type] == {
+        assert G.adj()[edge_type] == {
             0: {1: {"data": 2}, 2: {"weight": 3, "data": 2}},
             1: {0: {"data": 2}, 2: {"data": 4}},
             2: {0: {"weight": 3, "data": 2}, 1: {"data": 4}},
@@ -72,16 +72,17 @@ class TestMixedEdgeGraph(TestGraph):
     def test_remove_edge(self):
         G = self.K3.copy()
         G.remove_edge(0, 1, self.K3_edge_type)
-        assert G.adj == {self.K3_edge_type: {0: {2: {}}, 1: {2: {}}, 2: {0: {}, 1: {}}}}
+        assert G.adj() == {self.K3_edge_type: {0: {2: {}}, 1: {2: {}}, 2: {0: {}, 1: {}}}}
         with pytest.raises(nx.NetworkXError):
             G.remove_edge(-1, 0, self.K3_edge_type)
 
     def test_remove_edges_from(self):
         G = self.K3.copy()
         G.remove_edges_from([(0, 1)], self.K3_edge_type)
-        assert G.adj == {self.K3_edge_type: {0: {2: {}}, 1: {2: {}}, 2: {0: {}, 1: {}}}}
+        assert G.adj() == {self.K3_edge_type: {0: {2: {}}, 1: {2: {}}, 2: {0: {}, 1: {}}}}
         G.remove_edges_from([(0, 0)], self.K3_edge_type)  # silent fail
 
+    @pytest.mark.skip(reason="need to implement")
     def test_edges_data(self):
         G = self.K3
         all_edges = [(0, 1, {}), (0, 2, {}), (1, 2, {})]
@@ -91,6 +92,7 @@ class TestMixedEdgeGraph(TestGraph):
         with pytest.raises(nx.NetworkXError):
             G.edges(-1, True)
 
+    @pytest.mark.skip(reason="need to implement")
     def test_get_edge_data(self):
         G = self.K3.copy()
         assert G.get_edge_data(0, 1) == {}
@@ -137,14 +139,14 @@ class TestMixedEdgeGraph(TestGraph):
                 (4, 5, {}),
                 (6, 7, {"weight": 2}),
             ]
-        assert sorted(G.edges[self.K3_edge_type].data()) == elist
+        assert sorted(G.edges()[self.K3_edge_type].data()) == elist
         assert G.graph == {}
 
         # no keywords -- order is edges, nodes
         G = self.K3.copy()
         G.update([(4, 5), (6, 7, {"weight": 2})], [3, (4, {"size": 2})], self.K3_edge_type)
         assert sorted(G.nodes.data()) == nlist
-        assert sorted(G.edges[self.K3_edge_type].data()) == elist
+        assert sorted(G.edges()[self.K3_edge_type].data()) == elist
         assert G.graph == {}
 
         # update using only a graph
@@ -179,7 +181,7 @@ class TestMixedEdgeGraph(TestGraph):
             H.update(edges=[(3, 4)])
         H.add_edge_type(self._graph_func(), edge_type=edge_type)
         H.update(edges=[(3, 4)], edge_type=edge_type)
-        assert sorted(H.edges[edge_type].data()) == [(3, 4, {})]
+        assert sorted(H.edges()[edge_type].data()) == [(3, 4, {})]
         # assert H.size() == 1
 
         # No inputs -> exception
