@@ -57,7 +57,8 @@ jobs:
       - name: Install prerequisites
         run: |
           pip install --upgrade pip setuptools wheel virtualenv
-
+          pip install --upgrade --upgrade-strategy eager -r dev-requirements.txt
+          
       - name: Set build variables
         shell: bash
         run: |
@@ -152,6 +153,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade --upgrade-strategy eager -r requirements.txt
+          pip install --upgrade --upgrade-strategy eager -r dev-requirements.txt
 
       - name: Install Networkx (stable)
         if: "matrix.networkx-version == 'networkx-stable'"
