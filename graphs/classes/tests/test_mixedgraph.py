@@ -86,7 +86,7 @@ class BaseMixedEdgeGraphTester:
         after = count_objects_of_type(MyGraph)
         assert before == after
 
-    @pytest.mark.skip(reason="#TODO: doesnt work")
+    @pytest.mark.skip(reason="#TODO: doesn't work")
     def test_edges(self):
         G = self.K3
         edge_type = "undirected"
@@ -96,7 +96,7 @@ class BaseMixedEdgeGraphTester:
         with pytest.raises(nx.NetworkXError):
             G.edges(-1)
 
-    @pytest.mark.skip(reason="#TODO: doesnt work")
+    @pytest.mark.skip(reason="#TODO: doesn't work")
     def test_degree(self):
         G = self.K3
         assert sorted(G.degree()) == [(0, 2), (1, 2), (2, 2)]
@@ -141,7 +141,7 @@ class BaseMixedEdgeGraphTester:
         with pytest.raises(nx.NetworkXError):
             list(G.nbunch_iter(nbunch))
 
-    @pytest.mark.skip(reason="#TODO: doesnt work")
+    @pytest.mark.skip(reason="#TODO: doesn't work")
     def test_selfloop_degree(self):
         G = self.Graph()
         G.add_edge_type(nx.Graph(), "undirected")
@@ -152,7 +152,7 @@ class BaseMixedEdgeGraphTester:
         assert sorted(G.degree([1])) == [(1, 2)]
         assert G.degree(1, weight="weight") == 2
 
-    @pytest.mark.skip(reason="#TODO: doesnt work")
+    @pytest.mark.skip(reason="#TODO: doesn't work")
     def test_selfloops(self):
         G = self.K3.copy()
         G.add_edge(0, 0)
@@ -168,7 +168,7 @@ class BaseMixedEdgeGraphTester:
         G.add_edge(1, 1)
         G.remove_nodes_from([0, 1])
 
-    @pytest.mark.skip(reason="#TODO: doesnt work")
+    @pytest.mark.skip(reason="#TODO: doesn't work")
     def test_cache_reset(self):
         G = self.K3.copy()
         old_adj = G.adj
@@ -339,7 +339,7 @@ class TestMixedEdgeGraph(BaseMixedEdgeGraphTester):
         G.graph["foo"] = "bar"
         G.add_node(2, data=4)
         G.add_edge(0, 1, edge_type=edge_type, weight=0.5)
-        GG = G.copy()
+        # GG = G.copy()
         # H = self.Graph()
         # H.add_edge_type(self._graph_func(), edge_type=edge_type)
         # GG.update(H)

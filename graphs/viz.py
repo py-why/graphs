@@ -1,9 +1,5 @@
 def draw(G, direction="LR"):
-    """
-    Visualize the graph.
-
-    :return : dot language representation of the graph.
-    """
+    """Visualize the graph using DiGraph."""
     from graphviz import Digraph
 
     dot = Digraph()

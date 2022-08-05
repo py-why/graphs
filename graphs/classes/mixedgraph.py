@@ -1030,7 +1030,8 @@ class MixedEdgeGraph:
         """
         # if edge_type is None:
         # edge_type = self.edge_types
-        # return {edge_type_: graph.adj for edge_type_, graph in self._edge_graphs.items() if edge_type_ in edge_type}
+        # return {edge_type_: graph.adj for edge_type_, graph in
+        # self._edge_graphs.items() if edge_type_ in edge_type}
         return {edge_type: graph.adj for edge_type, graph in self._edge_graphs.items()}
         # else:
         #     return self.get_graphs(edge_type=edge_type).adj
@@ -1239,7 +1240,8 @@ class MixedEdgeGraph:
         """
         # if edge_type == 'all':
         # edge_type = self.edge_types
-        # return {edge_type_: graph.get_edge_data(u, v, default=default) for edge_type_, graph in self._edge_graphs.items() if edge_type_ in edge_type}
+        # return {edge_type_: graph.get_edge_data(u, v, default=default)
+        # for edge_type_, graph in self._edge_graphs.items() if edge_type_ in edge_type}
         edge_dict = dict()
         for edge_type_, graph in self.get_graphs().items():
             edge_dict[edge_type_] = graph.get_edge_data(u, v, default=default).get(edge_type_)

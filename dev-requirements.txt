@@ -7,6 +7,8 @@ pydocstyle
 codespell
 nbsphinx
 pandoc
+matplotlib
+graphviz
 
 # Running tests
 pytest
