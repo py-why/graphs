@@ -93,6 +93,7 @@ jobs:
       # Build docs
       - name: make html
         run: |
+          . .venv/bin/activate
           cd doc;
           make html;
 

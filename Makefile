@@ -50,7 +50,6 @@ run-checks:
 	black --check graphs examples
 	flake8 ./graphs
 	@$(MAKE) pydocstyle
-	check-manifest
 	@$(MAKE) codespell-error
 	
 

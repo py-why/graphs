@@ -126,7 +126,7 @@ print(f"Graph has node A: {G.has_node('A')}")
 # typically must be specified in edge operations for mixed edge graphs.
 
 # Edges: We can query specific edges by type
-print(f"The graph has directed edges: {G.edges('directed')}")
+print(f"The graph has directed edges: {G.edges['directed']}")
 
 # Note these edges correspond to the edges of the internal networkx
 # DiGraph that represents the directed edges
@@ -157,16 +157,17 @@ assert "Z" in G.neighbors("X")
 
 # Similar to the networkx API, the ``adj`` provides a way to iterate
 # through the nodes and edges, but now over different edge types.
-for edge_type, adj in G.adj().items():
+for edge_type, adj in G.adj.items():
     print(edge_type)
     print(adj)
 
-# If you only want the adjacencies of the directed edges
-print(G.adj(edge_type="directed"))
+# If you only want the adjacencies of the directed edges, you can
+# query the returned dictionary of adjacencies.
+print(G.adj["directed"])
 
 # Similar to the networkx API, the ``edges`` provides a way to iterate
 # through the edges, but now over different edge types.
-for edge_type, edges in G.edges().items():
+for edge_type, edges in G.edges.items():
     print(edge_type)
     print(edges)
 
