@@ -24,6 +24,9 @@ sys.path.append(os.path.abspath(os.path.join(curdir, '..', 'graphs')))
 #
 needs_sphinx = '4.0'
 
+# A list of prefixs that are ignored when creating the module index. (new in Sphinx 0.6)
+modindex_common_prefix = ["networkx."]
+
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
@@ -31,9 +34,10 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.doctest',
+    "sphinx.ext.coverage",
     'sphinx.ext.intersphinx',
-    'sphinx_autodoc_typehints',
     'sphinx.ext.mathjax',
+    "sphinx.ext.todo",
     'sphinx.ext.viewcode',
     'sphinx_gallery.gen_gallery',
     'numpydoc',
@@ -71,10 +75,11 @@ error_ignores = {
 
 # -- numpydoc
 # Below is needed to prevent errors
-numpydoc_xref_param_type = True
+# numpydoc_xref_param_type = True
 numpydoc_class_members_toctree = False
-numpydoc_attributes_as_param_list = True
+# numpydoc_attributes_as_param_list = True
 numpydoc_use_blockquotes = True
+numpydoc_show_class_members = False
 
 numpydoc_xref_ignore = {
     # words
@@ -109,6 +114,8 @@ numpydoc_xref_ignore = {
     "node",
     "nodes",
     "graph",
+    "collection",
+    "u", "v"
     # shapes
     "n_times",
     "obj",
@@ -122,9 +129,13 @@ numpydoc_xref_ignore = {
 }
 numpydoc_xref_aliases = {
     # Networkx
+    "Graph": "networkx.Graph",
+    "DiGraph": "networkx.DiGraph",
     "nx.Graph": "networkx.Graph",
     "nx.DiGraph": "networkx.DiGraph",
+    "nx.MultiGraph": "networkx.MultiGraph",
     "nx.MultiDiGraph": "networkx.MultiDiGraph",
+    "NetworkXError": "networkx.NetworkXError",
     "pgmpy.models.BayesianNetwork": "pgmpy.models.BayesianNetwork",
     # Causal-Networkx
     "ADMG": "causal_networkx.ADMG",
@@ -139,7 +150,7 @@ numpydoc_xref_aliases = {
     "column": "pandas.DataFrame.columns",
 }
 
-numpydoc_validate = True
+# numpydoc_validate = True
 numpydoc_validation_checks = {'all'} | set(error_ignores)
 numpydoc_validation_exclude = {  # set of regex
     # dict subclasses
@@ -183,6 +194,8 @@ author = u'Adam Li'
 version = graphs.__version__
 # The full version, including alpha/beta/rc tags.
 release = version
+
+doctest_global_setup = "import networkx as nx"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -232,12 +245,15 @@ html_context = {
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
+    "neps": ("https://numpy.org/neps", None),
+    "nx-guides": ("https://networkx.org/nx-guides/", None),
+    "sympy": ("https://docs.sympy.org/latest/", None),
     'numpy': ('https://numpy.org/devdocs', None),
     'scipy': ('https://scipy.github.io/devdocs', None),
+    "networkx": ("https://networkx.org/documentation/latest/", None),
+    "pygraphviz": ("https://pygraphviz.github.io/documentation/stable/", None),
     'matplotlib': ('https://matplotlib.org/stable', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/dev', None),
-    'sklearn': ('https://scikit-learn.org/stable', None),
-    'joblib': ('https://joblib.readthedocs.io/en/latest', None),
 }
 intersphinx_timeout = 5
 
