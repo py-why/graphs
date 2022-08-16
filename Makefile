@@ -13,10 +13,10 @@ check-manifest:
 	check-manifest --ignore .circleci*,doc,logo,.DS_Store
 
 codespell:  # running manually
-	@codespell -w -i 3 -q 3 -S $(CODESPELL_SKIPS) --ignore-words=ignore_words.txt $(CODESPELL_DIRS)
+	@codespell -w -i 3 -q 3 -S $(CODESPELL_SKIPS) --ignore-words=.codespellignore $(CODESPELL_DIRS)
 
 codespell-error:  # running on travis
-	@codespell -i 0 -q 7 -S $(CODESPELL_SKIPS) --ignore-words=ignore_words.txt $(CODESPELL_DIRS)
+	@codespell -i 0 -q 7 -S $(CODESPELL_SKIPS) --ignore-words=.codespellignore $(CODESPELL_DIRS)
 
 pydocstyle:
 	@echo "Running pydocstyle"
