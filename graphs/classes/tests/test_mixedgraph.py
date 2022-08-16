@@ -86,27 +86,9 @@ class BaseMixedEdgeGraphTester:
         after = count_objects_of_type(MyGraph)
         assert before == after
 
-    @pytest.mark.skip(reason="#TODO: doesn't work")
-    def test_edges(self):
-        G = self.K3
-        edge_type = "undirected"
-        assert edges_equal(G.edges[edge_type], [(0, 1), (0, 2), (1, 2)])
-        assert edges_equal(G.edges[edge_type][0], [(0, 1), (0, 2)])
-        assert edges_equal(G.edges[edge_type][0, 1], [(0, 1), (0, 2), (1, 2)])
-        with pytest.raises(nx.NetworkXError):
-            G.edges(-1)
-
-    @pytest.mark.skip(reason="#TODO: doesn't work")
-    def test_degree(self):
-        G = self.K3
-        assert sorted(G.degree()) == [(0, 2), (1, 2), (2, 2)]
-        assert dict(G.degree()) == {0: 2, 1: 2, 2: 2}
-        assert G.degree() == 2
-        with pytest.raises(nx.NetworkXError):
-            G.degree(-1)  # node not in graph
-
     def test_size(self):
         G = self.K3
+        print(G)
         assert G.size() == 3
         assert G.number_of_edges() == 3
 
@@ -141,16 +123,38 @@ class BaseMixedEdgeGraphTester:
         with pytest.raises(nx.NetworkXError):
             list(G.nbunch_iter(nbunch))
 
-    @pytest.mark.skip(reason="#TODO: doesn't work")
+    def test_attributes_cached(self):
+        G = self.K3.copy()
+        assert id(G.nodes) == id(G.nodes)
+        assert id(G.adj) == id(G.adj)
+        # TODO: not cached property yet
+        # assert id(G.edges()) == id(G.edges())
+        # assert id(G.degree) == id(G.degree)
+
+    def test_edges(self):
+        G = self.K3
+        edge_type = self.K3_edge_type
+        assert edges_equal(G.edges()[edge_type], [(0, 1), (0, 2), (1, 2)])
+        assert edges_equal(G.edges(0)[edge_type], [(0, 1), (0, 2)])
+        assert edges_equal(G.edges([0, 1])[edge_type], [(0, 1), (0, 2), (1, 2)])
+
+    def test_degree(self):
+        G = self.K3
+        assert sorted(G.degree()[self.K3_edge_type]) == [(0, 2), (1, 2), (2, 2)]
+        assert dict(G.degree()[self.K3_edge_type]) == {0: 2, 1: 2, 2: 2}
+        assert G.degree(0)[self.K3_edge_type] == 2
+        with pytest.raises(nx.NetworkXError):
+            G.degree(-1)  # node not in graph
+
     def test_selfloop_degree(self):
         G = self.Graph()
         G.add_edge_type(nx.Graph(), "undirected")
         G.add_edge(1, 1, edge_type="undirected")
-        assert sorted(G.degree()) == [(1, 2)]
-        assert dict(G.degree()) == {1: 2}
-        assert G.degree(1) == 2
-        assert sorted(G.degree([1])) == [(1, 2)]
-        assert G.degree(1, weight="weight") == 2
+        assert sorted(G.degree()[self.K3_edge_type]) == [(1, 2)]
+        assert dict(G.degree()[self.K3_edge_type]) == {1: 2}
+        assert G.degree(1)[self.K3_edge_type] == 2
+        assert sorted(G.degree([1])[self.K3_edge_type]) == [(1, 2)]
+        assert G.degree(1, weight="weight")[self.K3_edge_type] == 2
 
     @pytest.mark.skip(reason="#TODO: doesn't work")
     def test_selfloops(self):
@@ -168,7 +172,6 @@ class BaseMixedEdgeGraphTester:
         G.add_edge(1, 1)
         G.remove_nodes_from([0, 1])
 
-    @pytest.mark.skip(reason="#TODO: doesn't work")
     def test_cache_reset(self):
         G = self.K3.copy()
         old_adj = G.adj
@@ -178,16 +181,8 @@ class BaseMixedEdgeGraphTester:
 
         old_nodes = G.nodes
         assert id(G.nodes) == id(old_nodes)
-        G._node = {}
+        G.nodes = {}
         assert id(G.nodes) != id(old_nodes)
-
-    def test_attributes_cached(self):
-        G = self.K3.copy()
-        assert id(G.nodes) == id(G.nodes)
-        assert id(G.edges) == id(G.edges)
-        assert id(G.adj) == id(G.adj)
-        # TODO: not cached property yet
-        # assert id(G.degree) == id(G.degree)
 
 
 class TestMixedEdgeGraph(BaseMixedEdgeGraphTester):
@@ -264,24 +259,22 @@ class TestMixedEdgeGraph(BaseMixedEdgeGraphTester):
         assert G.adj == {self.K3_edge_type: {0: {2: {}}, 1: {2: {}}, 2: {0: {}, 1: {}}}}
         G.remove_edges_from([(0, 0)], self.K3_edge_type)  # silent fail
 
-    @pytest.mark.skip(reason="need to implement")
     def test_edges_data(self):
         G = self.K3
         all_edges = [(0, 1, {}), (0, 2, {}), (1, 2, {})]
-        assert edges_equal(G.edges(data=True), all_edges)
-        assert edges_equal(G.edges(0, data=True), [(0, 1, {}), (0, 2, {})])
-        assert edges_equal(G.edges([0, 1], data=True), all_edges)
+        assert edges_equal(G.edges(data=True)[self.K3_edge_type], all_edges)
+        assert edges_equal(G.edges(0, data=True)[self.K3_edge_type], [(0, 1, {}), (0, 2, {})])
+        assert edges_equal(G.edges([0, 1], data=True)[self.K3_edge_type], all_edges)
         with pytest.raises(nx.NetworkXError):
             G.edges(-1, True)
 
-    @pytest.mark.skip(reason="need to implement")
     def test_get_edge_data(self):
         G = self.K3.copy()
-        assert G.get_edge_data(0, 1) == {}
-        assert G[0][1] == {}
-        assert G.get_edge_data(10, 20) is None
-        assert G.get_edge_data(-1, 0) is None
-        assert G.get_edge_data(-1, 0, default=1) == 1
+        assert G.get_edge_data(0, 1) == {self.K3_edge_type: {}}
+        assert G[self.K3_edge_type][0][1] == {}
+        assert G.get_edge_data(10, 20)[self.K3_edge_type] is None
+        assert G.get_edge_data(-1, 0)[self.K3_edge_type] is None
+        assert G.get_edge_data(-1, 0, default=1)[self.K3_edge_type] == 1
 
     def test_update(self):
         # specify both edges and nodes
@@ -321,14 +314,14 @@ class TestMixedEdgeGraph(BaseMixedEdgeGraphTester):
                 (4, 5, {}),
                 (6, 7, {"weight": 2}),
             ]
-        assert sorted(G.edges[self.K3_edge_type].data()) == elist
+        assert sorted(G.edges()[self.K3_edge_type].data()) == elist
         assert G.graph == {}
 
         # no keywords -- order is edges, nodes
         G = self.K3.copy()
         G.update([(4, 5), (6, 7, {"weight": 2})], [3, (4, {"size": 2})], self.K3_edge_type)
         assert sorted(G.nodes.data()) == nlist
-        assert sorted(G.edges[self.K3_edge_type].data()) == elist
+        assert sorted(G.edges()[self.K3_edge_type].data()) == elist
         assert G.graph == {}
 
         # TODO: implement updating via another mixed-edge graph
@@ -364,7 +357,7 @@ class TestMixedEdgeGraph(BaseMixedEdgeGraphTester):
             H.update(edges=[(3, 4)])
         H.add_edge_type(self._graph_func(), edge_type=edge_type)
         H.update(edges=[(3, 4)], edge_type=edge_type)
-        assert sorted(H.edges[edge_type].data()) == [(3, 4, {})]
+        assert sorted(H.edges()[edge_type].data()) == [(3, 4, {})]
         assert H.size() == 1
 
         # No inputs -> exception

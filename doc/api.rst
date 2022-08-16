@@ -15,3 +15,4 @@ Most-used functions
    :toctree: generated/
 
    MixedEdgeGraph
+   m_separated

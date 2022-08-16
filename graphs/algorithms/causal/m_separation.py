@@ -4,6 +4,8 @@ from graphs import MixedEdgeGraph
 
 from .convert import bidirected_to_unobserved_confounder
 
+__all__ = ["m_separated"]
+
 
 def m_separated(G, x, y, z, bidirected_edge_name="bidirected", directed_edge_name="directed"):
     """Check m-separation among 'x' and 'y' given 'z' in mixed-edge causal graph G.
@@ -48,7 +50,7 @@ def m_separated(G, x, y, z, bidirected_edge_name="bidirected", directed_edge_nam
             'you have a directed graph, use "d_separated" function instead.'
         )
     if any(
-        edge_type not in [bidirected_edge_name, directed_edge_name] for edge_type in G.edge_types
+        edge_type not in G.edge_types for edge_type in [bidirected_edge_name, directed_edge_name]
     ):
         raise RuntimeError(
             f"m-separation only works on graphs with directed and bidirected edges. "
@@ -69,5 +71,5 @@ def m_separated(G, x, y, z, bidirected_edge_name="bidirected", directed_edge_nam
     uc_nodes = {node for node, label in explicit_G.nodes(data="label") if label is not None}
 
     # make sure there are always conditioned on the conditioning set
-    z = z.union(uc_nodes)
+    assert all(uc_node not in z for uc_node in uc_nodes)
     return d_separated(explicit_G, x, y, z)
