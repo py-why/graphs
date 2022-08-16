@@ -14,9 +14,9 @@ jobs:
             name: Complete checkout
             command: |
               if ! git remote -v | grep upstream; then
-                git remote add upstream https://github.com/py-why/pywhy-graphs.git
+                git remote add upstream https://github.com/py-why/graphs.git
               fi
-              git remote set-url upstream https://github.com/py-why/pywhy-graphs.git
+              git remote set-url upstream https://github.com/py-why/graphs.git
               git fetch upstream
         - save_cache:
             name: Save .git
@@ -74,7 +74,7 @@ jobs:
               python -m pip install --progress-bar off --upgrade pip setuptools wheel
               python -m pip install --progress-bar off .
               python -m pip install --progress-bar off .[doc,gui]
-              python -m pip install --progress-bar off git+https://github.com/py-why/pywhy-graphs
+              python -m pip install --progress-bar off git+https://github.com/py-why/graphs
         - save_cache:
             name: Save pip cache
             key: pip-cache
