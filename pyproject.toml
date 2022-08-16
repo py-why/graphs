@@ -113,7 +113,7 @@ convention = 'numpy'
 ignore-decorators = '(copy_doc|property|.*setter|.*getter|pyqtSlot|Slot)'
 match = '^(?!setup|__init__|test_).*\.py'
 match-dir = '^pywhy_graphs.*'
-add_ignore = 'D100,D104,D107'
+add_ignore = 'D100,D104,D107,D104'
 
 
 [tool.pytest.ini_options]

@@ -126,7 +126,3 @@ workflows:
       - build_doc:
           name: build_doc
 
-  main:
-    jobs:
-      - build_doc:
-          name: build_doc_main

@@ -148,6 +148,7 @@ class MixedEdgeGraph:
         )
 
     def number_of_edge_types(self):
+        """The number of edge types."""
         return len(self.edge_types)
 
     @property

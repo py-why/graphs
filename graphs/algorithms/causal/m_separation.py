@@ -1,6 +1,6 @@
 from networkx.algorithms import d_separated
 
-from graphs import MixedEdgeGraph
+import graphs
 
 from .convert import bidirected_to_unobserved_confounder
 
@@ -44,7 +44,7 @@ def m_separated(G, x, y, z, bidirected_edge_name="bidirected", directed_edge_nam
     This wraps the networkx implementation, which only allows DAGs. Since
     ``ADMG`` is not represented.
     """
-    if not isinstance(G, MixedEdgeGraph):
+    if not isinstance(G, graphs.MixedEdgeGraph):
         raise RuntimeError(
             "m-separation should only be run on a MixedEdgeGraph. If "
             'you have a directed graph, use "d_separated" function instead.'

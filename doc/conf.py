@@ -25,7 +25,7 @@ sys.path.append(os.path.abspath(os.path.join(curdir, '..', 'graphs')))
 needs_sphinx = '4.0'
 
 # A list of prefixs that are ignored when creating the module index. (new in Sphinx 0.6)
-modindex_common_prefix = ["networkx."]
+modindex_common_prefix = ["graphs.", "networkx.", "nx."]
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -52,8 +52,8 @@ copybutton_prompt_is_regexp = True
 # -- sphinx.ext.autosummary
 autosummary_generate = True
 
-autodoc_default_options = {'inherited-members': None}
-autodoc_typehints = 'signature'
+# autodoc_default_options = {'inherited-members': None}
+# autodoc_typehints = 'signature'
 
 # prevent jupyter notebooks from being run even if empty cell
 # nbsphinx_execute = 'never'
@@ -76,10 +76,11 @@ error_ignores = {
 # -- numpydoc
 # Below is needed to prevent errors
 # numpydoc_xref_param_type = True
-numpydoc_class_members_toctree = False
+# numpydoc_show_class_members = False
+# numpydoc_class_members_toctree = False
 # numpydoc_attributes_as_param_list = True
-numpydoc_use_blockquotes = True
-numpydoc_show_class_members = False
+# numpydoc_use_blockquotes = True
+# numpydoc_show_class_members = False
 
 numpydoc_xref_ignore = {
     # words
@@ -115,7 +116,7 @@ numpydoc_xref_ignore = {
     "nodes",
     "graph",
     "collection",
-    "u", "v"
+    "u", "v",
     # shapes
     "n_times",
     "obj",
@@ -149,23 +150,21 @@ numpydoc_xref_aliases = {
     "pandas.DataFrame": "pandas.DataFrame",
     "column": "pandas.DataFrame.columns",
 }
-
-# numpydoc_validate = True
-numpydoc_validation_checks = {'all'} | set(error_ignores)
-numpydoc_validation_exclude = {  # set of regex
-    # dict subclasses
-    r'\.clear', r'\.get$', r'\.copy$', r'\.fromkeys', r'\.items', r'\.keys',
-    r'\.pop', r'\.popitem', r'\.setdefault', r'\.update', r'\.values',
-    # list subclasses
-    r'\.append', r'\.count', r'\.extend', r'\.index', r'\.insert', r'\.remove',
-    r'\.sort',
-    # we currently don't document these properly (probably okay)
-    r'\.__getitem__', r'\.__contains__', r'\.__hash__', r'\.__mul__',
-    r'\.__sub__', r'\.__add__', r'\.__iter__', r'\.__div__', r'\.__neg__',
-    r'plot_circle',
-    r'nn.Module',
-}
-
+# # numpydoc_validate = True
+# # numpydoc_validation_checks = {'all'} | set(error_ignores)
+# numpydoc_validation_exclude = {  # set of regex
+#     # dict subclasses
+#     r'\.clear', r'\.get$', r'\.copy$', r'\.fromkeys', r'\.items', r'\.keys',
+#     r'\.pop', r'\.popitem', r'\.setdefault', r'\.update', r'\.values',
+#     # list subclasses
+#     r'\.append', r'\.count', r'\.extend', r'\.index', r'\.insert', r'\.remove',
+#     r'\.sort',
+#     # we currently don't document these properly (probably okay)
+#     r'\.__getitem__', r'\.__contains__', r'\.__hash__', r'\.__mul__',
+#     r'\.__sub__', r'\.__add__', r'\.__iter__', r'\.__div__', r'\.__neg__',
+#     r'plot_circle',
+#     r'nn.Module',
+# }
 
 default_role = 'obj'
 
@@ -195,6 +194,14 @@ version = graphs.__version__
 # The full version, including alpha/beta/rc tags.
 release = version
 
+# If true, the current module name will be prepended to all description
+# unit titles (such as .. function::).
+add_module_names = False
+
+# A list of prefixs that are ignored when creating the module index. (new in Sphinx 0.6)
+modindex_common_prefix = ["networkx."]
+
+
 doctest_global_setup = "import networkx as nx"
 
 # List of patterns, relative to source directory, that match files and
@@ -205,7 +212,6 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', "**.ipynb_checkpoints"]
 # HTML options (e.g., theme)
 # see: https://sphinx-bootstrap-theme.readthedocs.io/en/latest/README.html
 # Clean up sidebar: Do not show "Source" link
-html_show_sourcelink = False
 html_copy_source = False
 
 html_theme = 'pydata_sphinx_theme'
@@ -268,15 +274,6 @@ if 'dev' in version:
 else:
     filepath_prefix = 'v{}'.format(version)
 
-compress_images = ('images', 'thumbnails')
-# let's make things easier on Windows users
-# (on Linux and macOS it's easy enough to require this)
-if sys.platform.startswith('win'):
-    try:
-        subprocess.check_call(['optipng', '--version'])
-    except Exception:
-        compress_images = ()
-
 sphinx_gallery_conf = {
     'doc_module': ('graphs',),
     'reference_url': {
@@ -296,11 +293,11 @@ sphinx_gallery_conf = {
     'capture_repr': ('_repr_html_',),
     'junit': os.path.join('..', 'test-results', 'sphinx-gallery', 'junit.xml'),
     'matplotlib_animations': True,
-    'compress_images': compress_images,
     'filename_pattern': '^((?!sgskip).)*$',
 }
 
-# Enable nitpicky mode - which ensures that all references in the docs
-# resolve.
-nitpicky = False
-nitpick_ignore = []
+# The reST default role (used for this markup: `text`) to use for all
+# documents.
+default_role = "obj"
+
+numpydoc_show_class_members = False

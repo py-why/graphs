@@ -1,1 +1,1 @@
-from graphs.algorithms.causal import *
+from graphs.algorithms.causal import *  # noqa: F403

@@ -19,7 +19,7 @@ For example, causal graphs typically have two types of edges:
 
 - ``->`` directed edges representing causal relations
 - ``<->`` bidirected edges representing the presence of an unobserved
-confounder.
+  confounder.
 
 This would type of mixed-edge graph with two internal graphs: a `nx.DiGraph`
 to represent the directed edges, and a `nx.Graph` to represent the bidirected
