@@ -22,10 +22,8 @@ class MixedEdgeGraph:
 
     A mixed-edge graph stores nodes and different kinds of edges.
     The edges can represent non-directed (i.e. `nx.Graph`), or
-    directed (i.e. `nx.DiGraph`) edge connections among nodes.
-
-    Nodes can be any nodes that can be represented in `nx.Graph`,
-    and `nx.DiGraph`.
+    directed (i.e. `nx.DiGraph`) edge connections among nodes. Nodes can be
+    any nodes that can be represented in `nx.Graph`, and `nx.DiGraph`.
 
     Edges are represented as links between nodes with optional
     key/value attributes.
@@ -62,11 +60,14 @@ class MixedEdgeGraph:
     Moreover, computing an ``edge_subgraph`` is not supported for
     ``MixedEdgeGraph``.
 
-    **Neighbors vs Adjacencies:**
+    **Edges, Adjacencies and Degree:**
 
     Compared to single-edge networkx graphs, ``MixedEdgeGraph`` implements
-    `adjacencies` instead of the ``neighbors`` function. This is because
-    ``neighbors`` in DiGraph are defined as the predecessors.
+    these as functions rather than cached properties.
+
+    **Neighbors:**
+    Compared to single-edge graphs, neighbors in a ``MixedEdgeGraph`` of a node is
+    defined as any other node with an edge connected to the node that is being checked.
 
     **Keywords:**
     Since ``MixedEdgeGraph`` comprises of possibly many different edge types.
@@ -131,12 +132,7 @@ class MixedEdgeGraph:
         --------
         >>> G = nx.Graph(name="foo")
         >>> str(G)
-        "Graph named 'foo' with 0 nodes and 0 edges"
-
-        >>> G = nx.path_graph(3)
-        >>> str(G)
-        'Graph with 3 nodes and 2 edges'
-
+        "MixedEdgeGraph named 'foo' with 0 nodes and 0 edges and 0 edge types"
         """
         return "".join(
             [
