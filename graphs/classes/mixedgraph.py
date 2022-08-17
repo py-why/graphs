@@ -152,8 +152,8 @@ class MixedEdgeGraph:
         """String identifier of the graph.
 
         This graph attribute appears in the attribute dict G.graph
-        keyed by the string `"name"`. as well as an attribute (technically
-        a property) `G.name`. This is entirely user controlled.
+        keyed by the string ``"name"``. as well as an attribute (technically
+        a property) ``G.name``. This is entirely user controlled.
         """
         return self.graph.get("name", "")
 
@@ -176,7 +176,7 @@ class MixedEdgeGraph:
 
         Returns
         -------
-        graph : Graph | dictionary of Graphs
+        graph : Graph | dictionary of Graph
             The graph representing a specific type of edge, or all edges.
 
         Raises
@@ -268,7 +268,7 @@ class MixedEdgeGraph:
     def has_node(self, n):
         """Returns True if the graph contains the node n.
 
-        Identical to `n in G`
+        Identical to ``n in G``
 
         Parameters
         ----------
@@ -433,7 +433,7 @@ class MixedEdgeGraph:
     def has_edge(self, u, v, edge_type="any"):
         """Returns True if the edge (u, v) is in the graph.
 
-        This is the same as `v in G[u]` without KeyError exceptions.
+        This is the same as ``v in G[u]`` without KeyError exceptions.
 
         Parameters
         ----------
@@ -528,7 +528,6 @@ class MixedEdgeGraph:
         See Also
         --------
         add_edge : add a single edge
-        add_weighted_edges_from : convenient way to add weighted edges
 
         Notes
         -----
@@ -647,7 +646,7 @@ class MixedEdgeGraph:
         Independent Shallow -- This copy creates new independent attribute
         dicts and then does a shallow copy of the attributes. That is, any
         attributes that are containers are shared between the new graph
-        and the original. This is exactly what `dict.copy()` provides.
+        and the original. This is exactly what ``dict.copy()`` provides.
         You can obtain this style copy using:
 
             >>> G = nx.path_graph(5)
@@ -891,7 +890,7 @@ class MixedEdgeGraph:
         1
 
         For directed graphs, this method can count the total number of
-        directed edges from `u` to `v`:
+        directed edges from ``u`` to ``v``:
 
         >>> G = nx.DiGraph()
         >>> G.add_edge(0, 1)
@@ -998,7 +997,7 @@ class MixedEdgeGraph:
         """Dictionary of graph adjacency objects holding the neighbors of each node.
 
         Each edge type has an adjacency object associated with it. For more information
-        on the adjacency object itself, see the documentation in `nx.Graph.adj`.
+        on the adjacency object itself, see the documentation in `networkx.Graph.adj`.
 
         Iterating over G.adj behaves like a dict. Useful idioms include the following
         for loop.
@@ -1015,10 +1014,6 @@ class MixedEdgeGraph:
         -------
         adj : dictionary of AdjacencyView
             A dictionary of edge types and their corresponding adjacency view objects.
-
-        See Also
-        --------
-        Graph, adj
         """
         return {edge_type: graph.adj for edge_type, graph in self._edge_graphs.items()}
 
@@ -1026,7 +1021,7 @@ class MixedEdgeGraph:
         """A dictionary of EdgeViews of the Graph as G.edges or G.edges().
 
         Each edge type has an EdgeView object associated with it. For more information
-        on the EdgeView object itself, see the documentation in `nx.Graph.edges`.
+        on the EdgeView object itself, see the documentation in ``networkx.Graph.edges``.
 
         Parameters
         ----------
@@ -1102,8 +1097,8 @@ class MixedEdgeGraph:
 
         Returns
         -------
-        DegreeView or int
-            If multiple nodes are requested (the default), returns a `DegreeView`
+        deg_dicts : dictionary of DegreeView or int
+            If multiple nodes are requested (the default), returns a ``DegreeView``
             mapping nodes to their degree.
             If a single node is requested, returns the degree of the node as an integer.
         """
@@ -1186,8 +1181,8 @@ class MixedEdgeGraph:
         >>> G[0][1]
         {}
 
-        Warning: Assigning to `G[u][v]` is not permitted.
-        But it is safe to assign attributes `G[u][v]['foo']`
+        Warning: Assigning to ``G[u][v]`` is not permitted.
+        But it is safe to assign attributes ``G[u][v]['foo']``
 
         >>> G[0][1]["weight"] = 7
         >>> G[0][1]["weight"]
