@@ -14,5 +14,4 @@ Most-used functions
 .. autosummary::
    :toctree: generated/
 
-   MixedEdgeGraph
    m_separated

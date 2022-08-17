@@ -3,16 +3,16 @@
 MixedEdgeGraph - Graph with different types of edges
 ====================================================
 
-A :class:`MixedEdgeGraph` is a graph comprised of a tuple, :math:`G = (V, E)`.
+A ``MixedEdgeGraph`` is a graph comprised of a tuple, :math:`G = (V, E)`.
 The difference compared to the other networkx graphs are the edges, E.
 ``E`` is comprised of a set of mixed edges defined by the user. This
 allows arbitrary representation of graphs with different types of edges.
-The :class:`MixedEdgeGraph` class represents each type of edge using an internal
-graph that is one of `nx.Graph` or `nx.DiGraph` classes. Each internal graph
+The ``MixedEdgeGraph`` class represents each type of edge using an internal
+graph that is one of ``nx.Graph`` or ``nx.DiGraph`` classes. Each internal graph
 represents one type of edge. 
 
-Semantically a :class:`MixedEdgeGraph` with just one type of edge, is just a normal
-:class:`nx.Graph` or :class:`nx.DiGraph` and should be converted to its appropriate
+Semantically a ``MixedEdgeGraph`` with just one type of edge, is just a normal
+``nx.Graph` or ``nx.DiGraph`` and should be converted to its appropriate
 networkx class.
 
 For example, causal graphs typically have two types of edges:
@@ -21,8 +21,8 @@ For example, causal graphs typically have two types of edges:
 - ``<->`` bidirected edges representing the presence of an unobserved
   confounder.
 
-This would type of mixed-edge graph with two internal graphs: a :class:`nx.DiGraph`
-to represent the directed edges, and a `nx.Graph` to represent the bidirected
+This would type of mixed-edge graph with two internal graphs: a ``nx.DiGraph``
+to represent the directed edges, and a ``nx.Graph`` to represent the bidirected
 edges.
 """
 
@@ -37,8 +37,8 @@ from graphs import MixedEdgeGraph
 # --------------------------
 # Using the ``MixedEdgeGraph``, we can represent a causal graph
 # with two different kinds of edges. To create the graph, we
-# use networkx `DiGraph` class to represent directed edges,
-# and `Graph` class to represent edges without directions (i.e.
+# use networkx ``nx.DiGraph`` class to represent directed edges,
+# and ``nx.Graph`` class to represent edges without directions (i.e.
 # bidirected edges). The edge types are then specified, so the mixed edge
 # graph object knows which graphs are associated with which types of edges.
 
@@ -100,7 +100,7 @@ bidirected_edges = G.get_graphs("bidirected")
 # Mixed Edge Graph Operations on Nodes
 # ------------------------------------
 
-# Nodes: Similar to `nx.Graph` and `nx.DiGraph`, the nodes of the graph
+# Nodes: Similar to ``nx.Graph`` and ``nx.DiGraph``, the nodes of the graph
 # can be queried via the same API. By default nodes are stored
 # inside every internal graph.
 nodes = G.nodes
