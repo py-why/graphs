@@ -3,16 +3,16 @@
 MixedEdgeGraph - Graph with different types of edges
 ====================================================
 
-A `MixedEdgeGraph` is a graph comprised of a tuple, :math:`G = (V, E)`.
+A :class:`MixedEdgeGraph` is a graph comprised of a tuple, :math:`G = (V, E)`.
 The difference compared to the other networkx graphs are the edges, E.
 ``E`` is comprised of a set of mixed edges defined by the user. This
 allows arbitrary representation of graphs with different types of edges.
-The `MixedEdgeGraph` class represents each type of edge using an internal
+The :class:`MixedEdgeGraph` class represents each type of edge using an internal
 graph that is one of `nx.Graph` or `nx.DiGraph` classes. Each internal graph
 represents one type of edge. 
 
-Semantically a `MixedEdgeGraph` with just one type of edge, is just a normal
-`nx.Graph` or `nx.DiGraph` and should be converted to its appropriate
+Semantically a :class:`MixedEdgeGraph` with just one type of edge, is just a normal
+:class:`nx.Graph` or :class:`nx.DiGraph` and should be converted to its appropriate
 networkx class.
 
 For example, causal graphs typically have two types of edges:
@@ -21,7 +21,7 @@ For example, causal graphs typically have two types of edges:
 - ``<->`` bidirected edges representing the presence of an unobserved
   confounder.
 
-This would type of mixed-edge graph with two internal graphs: a `nx.DiGraph`
+This would type of mixed-edge graph with two internal graphs: a :class:`nx.DiGraph`
 to represent the directed edges, and a `nx.Graph` to represent the bidirected
 edges.
 """
@@ -126,11 +126,11 @@ print(f"Graph has node A: {G.has_node('A')}")
 # typically must be specified in edge operations for mixed edge graphs.
 
 # Edges: We can query specific edges by type
-print(f"The graph has directed edges: {G.edges['directed']}")
+print(f"The graph has directed edges: {G.edges()['directed']}")
 
 # Note these edges correspond to the edges of the internal networkx
 # DiGraph that represents the directed edges
-print(G.get_graphs("directed").edges)
+print(G.get_graphs("directed").edges())
 
 # When querying, adding, or removing an edge, you must specify
 # the edge type as well.
@@ -167,7 +167,7 @@ print(G.adj["directed"])
 
 # Similar to the networkx API, the ``edges`` provides a way to iterate
 # through the edges, but now over different edge types.
-for edge_type, edges in G.edges.items():
+for edge_type, edges in G.edges().items():
     print(edge_type)
     print(edges)
 

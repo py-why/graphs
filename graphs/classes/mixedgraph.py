@@ -1003,10 +1003,9 @@ class MixedEdgeGraph:
         Iterating over G.adj behaves like a dict. Useful idioms include the following
         for loop.
 
-        ```
-        for edge_type, adj in G.adj.items():
-            for nbr, datadict in adj[n].items():
-        ```
+        >>> for edge_type, adj in G.adj.items():
+        >>>     for nbr, datadict in adj[n].items():
+        >>>          ...
 
         The main difference from non-mixed edge graph types is that ``adj`` here
         returns a dictionary of adjacency views, so neighbors can be queried within
