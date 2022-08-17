@@ -3,7 +3,7 @@ requires = ['setuptools >= 61.0.0']
 build-backend = 'setuptools.build_meta'
 
 [project]
-name = 'pywhy-graphs'
+name = 'graphs'
 version = '0.1.dev0'
 description = 'graphs: Mixed edge graphs for networkx.'
 readme = 'README.md'
@@ -76,13 +76,13 @@ test = [
     'pytest-cov',
 ]
 all = [
-    'pywhy-graphs[build]',
-    'pywhy-graphs[doc]',
-    'pywhy-graphs[style]',
-    'pywhy-graphs[test]',
+    'graphs[build]',
+    'graphs[doc]',
+    'graphs[style]',
+    'graphs[test]',
 ]
 full = [
-    'pywhy-graphs[all]',
+    'graphs[all]',
 ]
 
 [tool.black]
@@ -112,7 +112,7 @@ src_paths = ["graphs", "examples"]
 convention = 'numpy'
 ignore-decorators = '(copy_doc|property|.*setter|.*getter|pyqtSlot|Slot)'
 match = '^(?!setup|__init__|test_).*\.py'
-match-dir = '^pywhy_graphs.*'
+match-dir = '^graphs.*'
 add_ignore = 'D100,D104,D107,D104'
 
 
@@ -125,7 +125,7 @@ filterwarnings = []
 branch = true
 cover_pylib = false
 source = [
-    'pywhy_graphs',
+    'graphs',
 ]
 omit = [
     '**/__init__.py',
