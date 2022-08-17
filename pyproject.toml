@@ -1,3 +1,90 @@
+[build-system]
+requires = ['setuptools >= 61.0.0']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'pywhy-graphs'
+version = '0.1.dev0'
+description = 'graphs: Mixed edge graphs for networkx.'
+readme = 'README.md'
+license = {file = 'LICENSE'}
+requires-python = '~=3.8'
+maintainers = [
+    {name = 'Adam Li', email = 'adam.li@columbia.edu'},
+]
+keywords = [
+    'machine-learning',
+    'graphs',
+    'networkx',
+    'causality',
+]
+classifiers = [
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: Unix',
+    'Operating System :: MacOS',
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Natural Language :: English',
+    'License :: OSI Approved :: MIT License',
+    'Intended Audience :: Science/Research',
+    'Intended Audience :: Developers',
+    'Topic :: Software Development',
+    'Topic :: Scientific/Engineering',
+]
+dependencies = [
+    'numpy >= 1.16.0',
+    'scipy >= 1.2.0',
+    'networkx >= 2.8.3',
+    'importlib-resources; python_version<"3.9"',
+]
+
+[project.optional-dependencies]
+build = [
+    'build',
+    'twine',
+]
+doc = [
+    'memory_profiler',
+    'numpydoc',
+    'pydata-sphinx-theme',
+    'sphinx',
+    'sphinxcontrib-bibtex',
+    'sphinx-issues',
+    'sphinx-copybutton',
+    'sphinx-gallery',
+    'sphinx_rtd_theme',
+    'typing-extensions',
+    'pydot',
+    'pandas',
+    'matplotlib',
+    'graphviz',
+    'dowhy',
+]
+style = [
+    'black',
+    'codespell',
+    'isort',
+    'flake8',
+    'mypy',
+    'pydocstyle[toml]',
+]
+test = [
+    'pandas',
+    'pytest',
+    'pytest-cov',
+]
+all = [
+    'pywhy-graphs[build]',
+    'pywhy-graphs[doc]',
+    'pywhy-graphs[style]',
+    'pywhy-graphs[test]',
+]
+full = [
+    'pywhy-graphs[all]',
+]
+
 [tool.black]
 line-length = 100
 
@@ -15,10 +102,39 @@ exclude = '''
     | \bdoc\b
 )
 '''
+
 [tool.isort]
 profile = "black"
 multi_line_output = 3
+src_paths = ["graphs", "examples"]
 
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+[tool.pydocstyle]
+convention = 'numpy'
+ignore-decorators = '(copy_doc|property|.*setter|.*getter|pyqtSlot|Slot)'
+match = '^(?!setup|__init__|test_).*\.py'
+match-dir = '^pywhy_graphs.*'
+add_ignore = 'D100,D104,D107,D104'
+
+
+[tool.pytest.ini_options]
+minversion = '6.0'
+addopts = '--durations 20 --junit-xml=junit-results.xml --verbose'
+filterwarnings = []
+
+[tool.coverage.run]
+branch = true
+cover_pylib = false
+source = [
+    'pywhy_graphs',
+]
+omit = [
+    '**/__init__.py',
+    '**/tests/**',
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    'pragma: no cover',
+    'if __name__ == .__main__.:',
+]
+precision = 2

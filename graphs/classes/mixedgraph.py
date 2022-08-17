@@ -1,22 +1,29 @@
-from functools import cached_property
-from typing import List, Union, Dict
 from copy import deepcopy
+from enum import Enum
+from functools import cached_property
+from itertools import chain
+from typing import Dict, List, Union
 
 import networkx as nx
-from networkx import DiGraph, Graph
 from networkx.classes.reportviews import NodeView
 from networkx.exception import NetworkXError
+
+__all__ = ["MixedEdgeGraph"]
+
+
+class EdgeTypes(Enum):
+    directed = "directed"
+    bidirected = "bidirected"
+    undirected = "undirected"
 
 
 class MixedEdgeGraph:
     """Base class for mixed-edge graphs.
 
     A mixed-edge graph stores nodes and different kinds of edges.
-    The edges can represent non-directed (i.e. `Graph`), or
-    directed (i.e. `DiGraph`) edge connections among nodes.
-
-    Nodes can be any nodes that can be represented in `Graph`,
-    and `DiGraph`.
+    The edges can represent non-directed (i.e. `nx.Graph`), or
+    directed (i.e. `nx.DiGraph`) edge connections among nodes. Nodes can be
+    any nodes that can be represented in `nx.Graph`, and `nx.DiGraph`.
 
     Edges are represented as links between nodes with optional
     key/value attributes.
@@ -53,11 +60,14 @@ class MixedEdgeGraph:
     Moreover, computing an ``edge_subgraph`` is not supported for
     ``MixedEdgeGraph``.
 
-    **Neighbors vs Adjacencies:**
+    **Edges, Adjacencies and Degree:**
 
     Compared to single-edge networkx graphs, ``MixedEdgeGraph`` implements
-    `adjacencies` instead of the ``neighbors`` function. This is because
-    ``neighbors`` in DiGraph are defined as the predecessors.
+    these as functions rather than cached properties.
+
+    **Neighbors:**
+    Compared to single-edge graphs, neighbors in a ``MixedEdgeGraph`` of a node is
+    defined as any other node with an edge connected to the node that is being checked.
 
     **Keywords:**
     Since ``MixedEdgeGraph`` comprises of possibly many different edge types.
@@ -68,19 +78,39 @@ class MixedEdgeGraph:
     _graphs = list
     _edge_types = list
     graph_attr_dict_factory = dict
+    node_dict_factory = dict
+    node_attr_dict_factory = dict
 
-    def __init__(self, graphs: List, edge_types: List, **attr):
-        if len(graphs) != len(edge_types):
-            raise RuntimeError(
-                f"The number of graph objects passed in, {len(graphs)}, "
-                f"must match the number of edge types, {len(edge_types)}."
-            )
-        if any(not isinstance(graph, (Graph, DiGraph)) for graph in graphs):
-            raise RuntimeError("All graph object inputs must be one of Networkx Graph or DiGraph.")
+    def __init__(self, graphs: List = None, edge_types: List = None, **attr):
+        if any(x is not None for x in [graphs, edge_types]):
+            if not all(x is not None for x in [graphs, edge_types]):
+                raise RuntimeError(
+                    "If graphs or edge types are defined, then they both must be defined."
+                )
+            if len(graphs) != len(edge_types):
+                raise RuntimeError(
+                    f"The number of graph objects passed in, {len(graphs)}, "
+                    f"must match the number of edge types, {len(edge_types)}."
+                )
+            if any(not isinstance(graph, (nx.Graph, nx.DiGraph)) for graph in graphs):
+                raise RuntimeError(
+                    "All graph object inputs must be one of Networkx Graph or DiGraph."
+                )
+            nodes = set(graphs[0].nodes)
+            if not all(set(graph.nodes) == nodes for graph in graphs):
+                raise RuntimeError("All input networkx graphs must have the same nodes.")
 
-        # self._graphs = graphs
-        # self._edge_types = edge_types
-        self._edge_graphs = {edge_type: graph for edge_type, graph in zip(graphs, edge_types)}
+            # dictionary of internal graphs
+            self._edge_graphs = {edge_type: graph for edge_type, graph in zip(edge_types, graphs)}
+        else:
+            nodes = []
+            self._edge_graphs = dict()
+
+        self.node_dict_factory = self.node_dict_factory
+        self.node_attr_dict_factory = self.node_attr_dict_factory
+        self._node = self.node_dict_factory()  # empty node attribute dict
+        # ensure nodes are all within the necessary data structures
+        self.add_nodes_from(nodes)
 
         # dictionary for graph attributes
         # TODO: do we need the factory?
@@ -88,6 +118,34 @@ class MixedEdgeGraph:
         self.graph = self.graph_attr_dict_factory()
         # load graph attributes (must be after convert)
         self.graph.update(attr)
+
+    def __str__(self):
+        """Returns a short summary of the graph.
+
+        Returns
+        -------
+        info : string
+            Graph information including the graph name (if any), graph type, and the
+            number of nodes and edges.
+
+        Examples
+        --------
+        >>> G = nx.Graph(name="foo")
+        >>> str(G)
+        "MixedEdgeGraph named 'foo' with 0 nodes and 0 edges and 0 edge types"
+        """
+        return "".join(
+            [
+                type(self).__name__,
+                f" named {self.name!r}" if self.name else "",
+                f" with {self.number_of_nodes()} nodes and {self.number_of_edges()} edges",
+                f" with {self.number_of_edge_types()} edge types.",
+            ]
+        )
+
+    def number_of_edge_types(self):
+        """The number of edge types."""
+        return len(self.edge_types)
 
     @property
     def name(self):
@@ -107,7 +165,7 @@ class MixedEdgeGraph:
     def edge_types(self):
         return list(self._edge_graphs.keys())
 
-    def get_graphs(self, edge_type="all") -> Union[Graph, Dict[str, Graph]]:
+    def get_graphs(self, edge_type="all") -> Union[nx.Graph, Dict[str, nx.Graph]]:
         """Get graphs representing the mixed-edges.
 
         Parameters
@@ -134,12 +192,12 @@ class MixedEdgeGraph:
         if edge_type == "all":
             return self._edge_graphs
         else:
-            return self._graphs[edge_type]
+            return self._edge_graphs[edge_type]
 
     @cached_property
     def nodes(self):
         # simply return the NodeView of the first graph
-        return NodeView(self._edge_graphs[self.edge_types[0]])
+        return NodeView(self)
 
     def _apply_to_all_graphs(self, func_str, *args, **kwargs):
         """Utility for applying a common function to all internal graphs."""
@@ -155,28 +213,56 @@ class MixedEdgeGraph:
             raise ValueError(
                 f"Edge type {edge_type} not part of the " f"existing edge types in graph."
             )
-        edge_idx = self.edge_types.index(edge_type)
-        return self._graphs[edge_idx]
+        return self._edge_graphs[edge_type]
 
     def _internal_graph_nx_type(self, edge_type):
         if edge_type not in self.edge_types:
             raise ValueError(
                 f"Edge type {edge_type} not part of the " f"existing edge types in graph."
             )
-        edge_idx = self.edge_types.index(edge_type)
-        nx_graph_func = type(self._graphs[edge_idx])
+        nx_graph_func = type(self._edge_graphs[edge_type])
         return nx_graph_func
 
     def add_node(self, node_for_adding, **attr):
+        if node_for_adding not in self._node:
+            if node_for_adding is None:
+                raise ValueError("None cannot be a node")
+            attr_dict = self._node[node_for_adding] = self.node_attr_dict_factory()
+            attr_dict.update(attr)
+        else:  # update attr even if node already exists
+            self._node[node_for_adding].update(attr)
         self._apply_to_all_graphs("add_node", node_for_adding, **attr)
 
     def add_nodes_from(self, nodes_for_adding, **attr):
-        self._apply_to_all_graphs("add_nodes_from", nodes_for_adding, **attr)
+        for n in nodes_for_adding:
+            try:
+                newnode = n not in self._node
+                newdict = attr
+            except TypeError:
+                n, ndict = n
+                newnode = n not in self._node
+                newdict = attr.copy()
+                newdict.update(ndict)
+            if newnode:
+                if n is None:
+                    raise ValueError("None cannot be a node")
+                self._node[n] = self.node_attr_dict_factory()
+            self._node[n].update(newdict)
+            self._apply_to_all_graphs("add_node", n, **attr)
 
     def remove_node(self, n):
+        try:
+            del self._node[n]
+        except KeyError as err:  # NetworkXError if n not in self
+            raise NetworkXError(f"The node {n} is not in the graph.") from err
         self._apply_to_all_graphs("remove_node", n)
 
     def remove_nodes_from(self, nodes):
+        for n in nodes:
+            try:
+                del self._node[n]
+            except KeyError:
+                pass
         self._apply_to_all_graphs("remove_nodes_from", nodes)
 
     def has_node(self, n):
@@ -200,7 +286,10 @@ class MixedEdgeGraph:
         True
 
         """
-        return self._edge_graphs[self.edge_types[0]].has_node(n)
+        try:
+            return n in self._node
+        except TypeError:
+            return False
 
     def number_of_nodes(self):
         """Returns the number of nodes in the graph.
@@ -246,6 +335,7 @@ class MixedEdgeGraph:
 
     def clear(self):
         self._apply_to_all_graphs("clear")
+        self._node.clear()
         self.graph.clear()
 
     def clear_edges(self, edge_type="all"):
@@ -312,7 +402,7 @@ class MixedEdgeGraph:
         4
 
         """
-        return len(self.nodes)
+        return len(self._node)
 
     def __getitem__(self, n):
         """Returns a dict of neighbors of node n.  Use: 'G[n]'.
@@ -384,7 +474,7 @@ class MixedEdgeGraph:
         else:
             return self._get_internal_graph(edge_type=edge_type).has_edge(u, v)
 
-    def add_edge(self, u_for_edge, v_for_edge, edge_type, key=None, **attr):
+    def add_edge(self, u_of_edge, v_of_edge, edge_type="all", **attr):
         """Add an edge between u and v.
 
         The nodes u and v will be automatically added if they are
@@ -400,15 +490,9 @@ class MixedEdgeGraph:
             Nodes must be hashable (and not None) Python objects.
         edge_type : str
             The edge type.
-        key : hashable identifier, optional (default=lowest unused integer)
-            Used to distinguish multiedges between a pair of nodes.
         attr : keyword arguments, optional
             Edge data (or labels or objects) can be assigned using
             keyword arguments.
-
-        Returns
-        -------
-        The edge key assigned to the edge.
 
         See Also
         --------
@@ -417,8 +501,16 @@ class MixedEdgeGraph:
         Notes
         -----
         """
-        key = self._get_internal_graph(edge_type).add_edge(u_for_edge, v_for_edge, key=key, **attr)
-        return key
+        u, v = u_of_edge, v_of_edge
+        # add nodes
+        if u not in self._node:
+            self.add_node(u)
+        if v not in self._node:
+            self.add_node(v)
+        if edge_type == "all":
+            self._apply_to_all_graphs("add_edge", u_of_edge, v_of_edge, **attr)
+        else:
+            self._get_internal_graph(edge_type).add_edge(u_of_edge, v_of_edge, **attr)
 
     def add_edges_from(self, ebunch_to_add, edge_type, **attr):
         """Add all the edges in ebunch_to_add.
@@ -458,6 +550,22 @@ class MixedEdgeGraph:
         >>> G.add_edges_from([(1, 2), (2, 3)], weight=3)
         >>> G.add_edges_from([(3, 4), (1, 4)], label="WN2898")
         """
+        for e in ebunch_to_add:
+            ne = len(e)
+            if ne == 3:
+                u, v, _ = e
+            elif ne == 2:
+                u, v = e
+            else:
+                raise NetworkXError(f"Edge tuple {e} must be a 2-tuple or 3-tuple.")
+            if u not in self._node:
+                if u is None:
+                    raise ValueError("None cannot be a node")
+                self._node[u] = self.node_attr_dict_factory()
+            if v not in self._node:
+                if v is None:
+                    raise ValueError("None cannot be a node")
+                self._node[v] = self.node_attr_dict_factory()
         self._get_internal_graph(edge_type).add_edges_from(ebunch_to_add, **attr)
 
     def remove_edge(self, u, v, edge_type):
@@ -510,15 +618,13 @@ class MixedEdgeGraph:
         """
         self._get_internal_graph(edge_type).remove_edges_from(ebunch)
 
-    def copy(self, as_view=False):
+    def copy(self):
         """Returns a copy of the graph.
 
         The copy method by default returns an independent shallow copy
         of the graph and attributes. That is, if an attribute is a
         container, that container is shared by the original an the copy.
         Use Python's `copy.deepcopy` for new containers.
-
-        If `as_view` is True then a view is returned instead of a copy.
 
         Notes
         -----
@@ -587,14 +693,24 @@ class MixedEdgeGraph:
         >>> H = G.copy()
 
         """
-        if as_view is True:
-            return nx.graphviews.generic_graph_view(self)
         G = self.__class__()
         G.graph.update(self.graph)
-        G.add_nodes_from((n, d.copy()) for n, d in self._node.items())
-        G.add_edges_from(
-            (u, v, datadict.copy()) for u, nbrs in self._adj.items() for v, datadict in nbrs.items()
-        )
+
+        # add all internal graphs to the copy
+        int_graph_copies = []
+        for edge_type in self.edge_types:
+            graph_func = self._internal_graph_nx_type(edge_type=edge_type)
+            int_graph_copies.append(graph_func())
+
+            if edge_type not in G.edge_types:
+                G.add_edge_type(graph_func(), edge_type)
+
+        # add all nodes and edges now
+        G.add_nodes_from((n, d.copy()) for n, d in self.nodes.items())
+        for edge_type, adj in self.adj.items():
+            for u, nbrs in adj.items():
+                for v, datadict in nbrs.items():
+                    G.add_edge(u, v, edge_type, **datadict.copy())
         return G
 
     def is_multigraph(self):
@@ -604,12 +720,25 @@ class MixedEdgeGraph:
     def is_directed(self):
         """Returns True if graph is directed, False otherwise."""
         # TODO: need to double check that any directed graph algos. work as exp.
-        return any([isinstance(graph, DiGraph) for graph in self.get_graphs()])
+        return any([isinstance(graph, nx.DiGraph) for graph in self.get_graphs()])
+
+    def is_mixed(self):
+        return True
 
     def add_edge_type(self, graph, edge_type):
         if edge_type in self._edge_graphs:
             raise ValueError(f"edge_type {edge_type} is already in the graph.")
+
+        # ensure new graph type has all nodes
+        graph.add_nodes_from(self._node)
         self._edge_graphs[edge_type] = graph
+        self.add_nodes_from(graph.nodes)
+
+    def add_edge_types_from(self, graphs, edge_types):
+        if len(graphs) != len(edge_types):
+            raise ValueError("Number of graphs and edge types must be the same.")
+        for edge_type, graph in zip(edge_types, graphs):
+            self.add_edge_type(graph, edge_type)
 
     def remove_edge_type(self, edge_type):
         self._edge_graphs.pop(edge_type)
@@ -626,10 +755,6 @@ class MixedEdgeGraph:
             their edge data is different, only one edge is created
             with an arbitrary choice of which edge data to use.
             You must check and correct for this manually if desired.
-
-        See Also
-        --------
-        MultiGraph, copy, add_edge, add_edges_from
 
         Notes
         -----
@@ -657,18 +782,17 @@ class MixedEdgeGraph:
         >>> list(G2.edges)
         [(0, 1)]
         """
-        graph_class = Graph
+        graph_class = nx.Graph
 
         # deepcopy when not a view
         G = graph_class()
-        G.graph.update(deepcopy(self._graphs[0].graph))
+        G.graph.update(deepcopy(self.graph))
         G.add_nodes_from((n, deepcopy(d)) for n, d in self.nodes.items())
         G.add_edges_from(
-            (u, v, key, deepcopy(data))
-            for _, edge_adj in self.adj
+            (u, v, deepcopy(d))
+            for _, edge_adj in self.adj.items()
             for u, nbrs in edge_adj.items()
-            for v, keydict in nbrs.items()
-            for key, data in keydict.items()
+            for v, d in nbrs.items()
         )
         return G
 
@@ -714,18 +838,17 @@ class MixedEdgeGraph:
         >>> list(H.edges)
         [(0, 1)]
         """
-        graph_class = DiGraph
+        graph_class = nx.DiGraph
 
         # deepcopy when not a view
         G = graph_class()
         G.graph.update(deepcopy(self.graph))
         G.add_nodes_from((n, deepcopy(d)) for n, d in self._node.items())
         G.add_edges_from(
-            (u, v, key, deepcopy(data))
-            for _, edge_adj in self.adj
+            (u, v, deepcopy(d))
+            for _, edge_adj in self.adj.items()
             for u, nbrs in edge_adj.items()
-            for v, keydict in nbrs.items()
-            for key, data in keydict.items()
+            for v, d in nbrs.items()
         )
         return G
 
@@ -743,10 +866,10 @@ class MixedEdgeGraph:
         Returns
         -------
         nedges : int
-            The number of edges in the graph.  If nodes `u` and `v` are
+            The number of edges in the graph.  If nodes ``u`` and ``v`` are
             specified return the number of edges between those nodes. If
             the graph is directed, this only returns the number of edges
-            from `u` to `v`.
+            from ``u`` to ``v``.
 
         See Also
         --------
@@ -775,184 +898,12 @@ class MixedEdgeGraph:
         >>> G.add_edge(1, 0)
         >>> G.number_of_edges(0, 1)
         1
-
         """
         if edge_type is not None:
             return self._get_internal_graph(edge_type).number_of_edges(u=u, v=v)
 
         n_edges = sum(self._apply_to_all_graphs("number_of_edges", u, v))
         return n_edges
-
-    # TODO: For below make sure certain checks are made to ensure api vs networkx is the same
-    def update(self, edges=None, nodes=None, edge_type=None):
-        """Update the graph using nodes/edges/graphs as input.
-
-        Like dict.update, this method takes a graph as input, adding the
-        graph's nodes and edges to this graph. It can also take two inputs:
-        edges and nodes. Finally it can take either edges or nodes.
-        To specify only nodes the keyword `nodes` must be used.
-
-        The collections of edges and nodes are treated similarly to
-        the add_edges_from/add_nodes_from methods. When iterated, they
-        should yield 2-tuples (u, v) or 3-tuples (u, v, datadict).
-
-        Parameters
-        ----------
-        edges : Graph object, collection of edges, or None
-            The first parameter can be a graph or some edges. If it has
-            attributes `nodes` and `edges`, then it is taken to be a
-            Graph-like object and those attributes are used as collections
-            of nodes and edges to be added to the graph.
-            If the first parameter does not have those attributes, it is
-            treated as a collection of edges and added to the graph.
-            If the first argument is None, no edges are added.
-        nodes : collection of nodes, or None
-            The second parameter is treated as a collection of nodes
-            to be added to the graph unless it is None.
-            If `edges is None` and `nodes is None` an exception is raised.
-            If the first parameter is a Graph, then `nodes` is ignored.
-        """
-        if edges is not None:
-            if edge_type is None:
-                raise RuntimeError(f"Edge type is undefined.")
-
-            if nodes is not None:
-                self.add_nodes_from(nodes)
-                self.add_edges_from(edges, edge_type=edge_type)
-            else:
-                # check if edges is a Graph object
-                try:
-                    graph_nodes = edges.nodes
-                    graph_edges = edges.edges
-                except AttributeError:
-                    # edge not Graph-like
-                    self.add_edges_from(edges, edge_type=edge_type)
-                else:  # edges is Graph-like
-                    self.add_nodes_from(graph_nodes.data())
-                    self.add_edges_from(graph_edges.data(), edge_type=edge_type)
-                    self.graph.update(edges.graph)
-        elif nodes is not None:
-            self.add_nodes_from(nodes)
-        else:
-            raise NetworkXError("update needs nodes or edges input")
-
-    @cached_property
-    def adj(self):
-        """Dictionary of graph adjacency objects holding the neighbors of each node.
-
-        Each edge type has an adjacency object associated with it. For more information
-        on the adjacency object itself, see the documentation in `nx.Graph.adj`.
-
-        Iterating over G.adj behaves like a dict. Useful idioms include the following
-        for loop.
-        ```
-        for edge_type, adj in G.adj.items():
-            for nbr, datadict in adj[n].items():`
-        ```
-
-        The main difference from non-mixed edge graph types is that ``adj`` here
-        returns a dictionary of adjacency views, so neighbors can be queried within
-        each edge type.
-
-        Returns
-        -------
-        adj : dictionary of AdjacencyView
-            A dictionary of edge types and their corresponding adjacency view objects.
-
-        See Also
-        --------
-        Graph, adj
-        """
-        return {edge_type: graph.adj for edge_type, graph in self._edge_graphs.items()}
-
-    @cached_property
-    def edges(self):
-        """A dictionary of EdgeViews of the Graph as G.edges or G.edges().
-
-        Each edge type has an EdgeView object associated with it. For more information
-        on the EdgeView object itself, see the documentation in `nx.Graph.edges`.
-
-        Parameters
-        ----------
-        nbunch : single node, container, or all nodes (default= all nodes)
-            The view will only report edges from these nodes.
-        data : string or bool, optional (default=False)
-            The edge attribute returned in 3-tuple (u, v, ddict[data]).
-            If True, return edge attribute dict in 3-tuple (u, v, ddict).
-            If False, return 2-tuple (u, v).
-        keys : bool, optional (default=False)
-            If True, return edge keys with each edge, creating (u, v, k,
-            d) tuples when data is also requested (the default) and (u,
-            v, k) tuples when data is not requested.
-        default : value, optional (default=None)
-            Value used for edges that don't have the requested attribute.
-            Only relevant if data is not True or False.
-
-        Returns
-        -------
-        edges : dictionary of EdgeView
-            A dictionary of EdgeViews.
-
-        Notes
-        -----
-        Nodes in nbunch that are not in the graph will be (quietly) ignored.
-        For directed graphs this returns the out-edges.
-        """
-        return {edge_type: graph.edges() for edge_type, graph in self._edge_graphs.items()}
-
-    def subgraph(self, nodes):
-        """Returns a SubGraph view of the subgraph induced on `nodes`.
-
-        The induced subgraph of the graph contains the nodes in `nodes`
-        and the edges between those nodes.
-
-        Parameters
-        ----------
-        nodes : list, iterable
-            A container of nodes which will be iterated through once.
-
-        Returns
-        -------
-        G : MixedEdgeGraph
-            A copy of the graph with only the nodes.
-        """
-        induced_nodes = nx.filters.show_nodes(self.nbunch_iter(nodes))
-
-        # initialize list of empty internal graphs
-        graph_classes = [self._internal_graph_nx_type(edge_type)() for edge_type in self.edge_types]
-        graph = MixedEdgeGraph(graph_classes, edge_types=self.edge_types)
-        graph.add_nodes_from(induced_nodes)
-
-        # now add the edges for each edge type
-        for edge_type, _graph in graph._edge_graphs.items():
-            edges = self._get_internal_graph(edge_type).edges(induced_nodes)
-            _graph.add_edges_from(edges)
-        return graph
-
-    def adjacencies(self, n):
-        """Returns an iterator over all adjacencies of node n.
-
-        Parameters
-        ----------
-        n : node
-           A node in the graph
-
-        Returns
-        -------
-        neighbors : iterator
-            An iterator over all neighbors of node n
-
-        Raises
-        ------
-        NetworkXError
-            If the node n is not in the graph.
-        """
-        nghbrs = set()
-        for graph in self._edge_graphs.values():
-            if isinstance(graph, DiGraph):
-                nghbrs.add(set(graph.predecessors(n)))
-            nghbrs.add(set(graph.neighbors(n)))
-        return iter(nghbrs)
 
     def nbunch_iter(self, nbunch=None):
         """Returns an iterator over nodes contained in nbunch that are
@@ -978,9 +929,165 @@ class MixedEdgeGraph:
             If nbunch is not a node or sequence of nodes.
             If a node in nbunch is not hashable.
         """
-        return self._edge_graphs[self.edge_types[0]].nbunch_iter(nbunch=nbunch)
+        if self.edge_types:
+            edge_type = self.edge_types[0]
+        else:
+            raise NetworkXError("No edge types inside graph")
+        return self._get_internal_graph(edge_type=edge_type).nbunch_iter(nbunch=nbunch)
 
-    def degree(self, edge_types="all"):
+    # TODO: For below make sure certain checks are made to ensure api vs networkx is the same
+    def update(self, edges=None, nodes=None, edge_type=None):
+        """Update the graph using nodes/edges/graphs as input.
+
+        Like dict.update, this method takes a graph as input, adding the
+        graph's nodes and edges to this graph. It can also take two inputs:
+        edges and nodes. Finally it can take either edges or nodes.
+        To specify only nodes the keyword ``nodes`` must be used.
+
+        The collections of edges and nodes are treated similarly to
+        the add_edges_from/add_nodes_from methods. When iterated, they
+        should yield 2-tuples (u, v) or 3-tuples (u, v, datadict).
+
+        Parameters
+        ----------
+        edges : nx.Graph object, collection of edges, or None
+            The first parameter can be a graph or some edges. If it has
+            attributes ``nodes`` and `edges`, then it is taken to be a
+            Graph-like object and those attributes are used as collections
+            of nodes and edges to be added to the graph.
+            If the first parameter does not have those attributes, it is
+            treated as a collection of edges and added to the graph.
+            If the first argument is None, no edges are added.
+        nodes : collection of nodes, or None
+            The second parameter is treated as a collection of nodes
+            to be added to the graph unless it is None.
+            If ``edges is None`` and ``nodes is None`` an exception is raised.
+            If the first parameter is a Graph, then ``nodes`` is ignored.
+        """
+        if edges is not None:
+            if edge_type is None and not isinstance(edges, MixedEdgeGraph):
+                raise RuntimeError("Edge type is undefined.")
+            if isinstance(edges, MixedEdgeGraph):
+                raise RuntimeError("Not supported for updating with a graph yet.")
+
+            if nodes is not None:
+                self.add_nodes_from(nodes)
+                self.add_edges_from(edges, edge_type=edge_type)
+            else:
+                # check if edges is a Graph object
+                try:
+                    graph_nodes = edges.nodes
+                    graph_edges = edges.edges
+                except AttributeError:
+                    # edge not Graph-like
+                    self.add_edges_from(edges, edge_type=edge_type)
+                else:  # edges is Graph-like
+                    self.add_nodes_from(graph_nodes.data())
+                    self.add_edges_from(graph_edges[edge_type].data(), edge_type=edge_type)
+                    self.graph.update(edges.graph)
+        elif nodes is not None:
+            # TODO: if nodes is supported internally for MixeedEdgeGraph, we don't need this check
+            if len(self._edge_graphs) == 0:
+                raise RuntimeError("No edge types defined yet.")
+            self.add_nodes_from(nodes)
+        else:
+            raise NetworkXError("update needs nodes or edges input")
+
+    @cached_property
+    def adj(self):
+        """Dictionary of graph adjacency objects holding the neighbors of each node.
+
+        Each edge type has an adjacency object associated with it. For more information
+        on the adjacency object itself, see the documentation in `nx.Graph.adj`.
+
+        Iterating over G.adj behaves like a dict. Useful idioms include the following
+        for loop.
+
+        >>> for edge_type, adj in G.adj.items():
+        >>>     for nbr, datadict in adj[n].items():
+        >>>          ...
+
+        The main difference from non-mixed edge graph types is that ``adj`` here
+        returns a dictionary of adjacency views, so neighbors can be queried within
+        each edge type.
+
+        Returns
+        -------
+        adj : dictionary of AdjacencyView
+            A dictionary of edge types and their corresponding adjacency view objects.
+
+        See Also
+        --------
+        Graph, adj
+        """
+        return {edge_type: graph.adj for edge_type, graph in self._edge_graphs.items()}
+
+    def edges(self, nbunch=None, data=False, default=None):
+        """A dictionary of EdgeViews of the Graph as G.edges or G.edges().
+
+        Each edge type has an EdgeView object associated with it. For more information
+        on the EdgeView object itself, see the documentation in `nx.Graph.edges`.
+
+        Parameters
+        ----------
+        nbunch : single node, container, or all nodes (default= all nodes)
+            The view will only report edges from these nodes.
+        data : string or bool, optional (default=False)
+            The edge attribute returned in 3-tuple (u, v, ddict[data]).
+            If True, return edge attribute dict in 3-tuple (u, v, ddict).
+            If False, return 2-tuple (u, v).
+        default : value, optional (default=None)
+            Value used for edges that don't have the requested attribute.
+            Only relevant if data is not True or False.
+
+        Returns
+        -------
+        edges : dictionary of EdgeView
+            A dictionary of EdgeViews.
+
+        Notes
+        -----
+        Nodes in nbunch that are not in the graph will be (quietly) ignored.
+        For directed graphs this returns the out-edges.
+        """
+        return {
+            edge_type_: graph.edges(nbunch=nbunch, data=data, default=default)
+            for edge_type_, graph in self._edge_graphs.items()
+        }
+
+    def neighbors(self, n):
+        return chain.from_iterable(nx.all_neighbors(G, n) for _, G in self.get_graphs().items())
+
+    def subgraph(self, nodes):
+        """Returns a SubGraph view of the subgraph induced on ``nodes``.
+
+        The induced subgraph of the graph contains the nodes in ``nodes``
+        and the edges between those nodes.
+
+        Parameters
+        ----------
+        nodes : list, iterable
+            A container of nodes which will be iterated through once.
+
+        Returns
+        -------
+        G : MixedEdgeGraph
+            A copy of the graph with only the nodes.
+        """
+        induced_nodes = nx.filters.show_nodes(self.nbunch_iter(nodes))
+
+        # initialize list of empty internal graphs
+        graph_classes = [self._internal_graph_nx_type(edge_type)() for edge_type in self.edge_types]
+        graph = self.__class__(graph_classes, edge_types=self.edge_types)
+        graph.add_nodes_from(induced_nodes)
+
+        # now add the edges for each edge type
+        for edge_type, _graph in graph._edge_graphs.items():
+            edges = self._get_internal_graph(edge_type).edges(induced_nodes)
+            _graph.add_edges_from(edges)
+        return graph
+
+    def degree(self, nbunch=None, weight=None):
         """A DegreeView for the Graph as G.degree or G.degree().
 
         Parameters
@@ -1000,12 +1107,107 @@ class MixedEdgeGraph:
             mapping nodes to their degree.
             If a single node is requested, returns the degree of the node as an integer.
         """
-        if edge_types == "all":
-            edge_types = self.edge_types
-        elif any(edge_type not in self.edge_types for edge_type in edge_types):
-            raise ValueError(f"edge_types must be of {self.edge_types}.")
+        edge_type = self.edge_types
+        # get the DegreeView for each internal graph
+        deg_dicts = dict()
+        for _edge_type in edge_type:
+            deg_view = self._get_internal_graph(_edge_type).degree(nbunch=nbunch, weight=weight)
+            deg_dicts[_edge_type] = deg_view
+        return deg_dicts
 
-        for node in self:
-            for edge_type in edge_types:
-                deg = sum(len(nbrs) for nbrs in self.adj[edge_type][node])
-                yield node, deg
+    def size(self, weight=None, edge_type="all"):
+        """Returns the number of edges or total of all edge weights.
+
+        Parameters
+        ----------
+        weight : string or None, optional (default=None)
+            The edge attribute that holds the numerical value used
+            as a weight. If None, then each edge has weight 1.
+
+        Returns
+        -------
+        size : float
+            The number of edges or
+            (if weight keyword is provided) the total weight sum.
+
+            If weight is None, returns an int. Otherwise a float
+            (or more general numeric if the weights are more general).
+
+        See Also
+        --------
+        number_of_edges
+
+        Examples
+        --------
+        >>> G = nx.path_graph(4)  # or DiGraph, MultiGraph, MultiDiGraph, etc
+        >>> G.size()
+        3
+
+        >>> G = nx.Graph()  # or DiGraph, MultiGraph, MultiDiGraph, etc
+        >>> G.add_edge("a", "b", weight=2)
+        >>> G.add_edge("b", "c", weight=4)
+        >>> G.size()
+        2
+        >>> G.size(weight="weight")
+        6.0
+        """
+        if edge_type == "all":
+            edge_types = self.edge_types
+
+        s = 0
+        for _edge_type in edge_types:
+            s = sum(d for v, d in self.degree(weight=weight)[_edge_type])
+        # If `weight` is None, the sum of the degrees is guaranteed to be
+        # even, so we can perform integer division and hence return an
+        # integer. Otherwise, the sum of the weighted degrees is not
+        # guaranteed to be an integer, so we perform "real" division.
+        return s // 2 if weight is None else s / 2
+
+    def get_edge_data(self, u, v, default=None):
+        """Returns the attribute dictionary associated with edge (u, v).
+
+        This is identical to ``G[u][v]`` except the default is returned
+        instead of an exception if the edge doesn't exist.
+
+        Parameters
+        ----------
+        u, v : nodes
+        default:  any Python object (default=None)
+            Value to return if the edge (u, v) is not found.
+
+        Returns
+        -------
+        edge_dict : dictionary
+            The edge attribute dictionary.
+
+        Examples
+        --------
+        >>> G = nx.path_graph(4)  # or DiGraph, MultiGraph, MultiDiGraph, etc
+        >>> G[0][1]
+        {}
+
+        Warning: Assigning to `G[u][v]` is not permitted.
+        But it is safe to assign attributes `G[u][v]['foo']`
+
+        >>> G[0][1]["weight"] = 7
+        >>> G[0][1]["weight"]
+        7
+        >>> G[1][0]["weight"]
+        7
+
+        >>> G = nx.path_graph(4)  # or DiGraph, MultiGraph, MultiDiGraph, etc
+        >>> G.get_edge_data(0, 1)  # default edge data is {}
+        {}
+        >>> e = (0, 1)
+        >>> G.get_edge_data(*e)  # tuple form
+        {}
+        >>> G.get_edge_data("a", "b", default=0)  # edge not in graph, return 0
+        0
+        """
+        edge_dict = dict()
+        for edge_type_, graph in self.get_graphs().items():
+            edge_data = graph.get_edge_data(u, v, default=default)
+            if edge_data != default:
+                edge_data = edge_data.get(edge_type_, dict())
+            edge_dict[edge_type_] = edge_data
+        return edge_dict
