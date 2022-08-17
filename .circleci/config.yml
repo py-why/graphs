@@ -93,7 +93,7 @@ jobs:
             name: Check installation
             command: |
                LIBGL_DEBUG=verbose python -c "import matplotlib.pyplot as plt; plt.figure()"
-               python -c "import pywhy_graphs;"
+               python -c "import graphs;"
                python -c "import numpy; numpy.show_config()"
         - run:
             name: Build documentation
