@@ -5,6 +5,8 @@
 
 # graphs
 
+Playground for PRable stuff into networkx. Do not use this repo unless you are working with the pywhy team on networkx-implementations.
+
 Base classes for graphs that extend [networkx](https://github.com/networkx/networkx) to be used in other PyWhy libraries.
 
 Please refer to the networkx code to see how things should be structured. The intention is to PR functionality in this repo directly by:
