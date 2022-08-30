@@ -22,7 +22,7 @@ def m_separated(G, x, y, z, bidirected_edge_name="bidirected", directed_edge_nam
 
     This algorithm first obtains the ancestral subgraph of x | y | z which only requires knowledge of the directed edges. Then, all outgoing directed edges from nodes in z are deleted. After that, an undirected graph composed from the directed and bidirected edges amongst the remaining nodes is created. Then, x is independent of y given z if x is disconnected from y in this new graph.
 
-    [1] Darwiche, A.  (2009).  Modeling and reasoning with Bayesian networks. 
+    [1] Darwiche, A.  (2009).  Modeling and reasoning with Bayesian networks.
        Cambridge: Cambridge University Press.
 
     Parameters
@@ -65,12 +65,12 @@ def m_separated(G, x, y, z, bidirected_edge_name="bidirected", directed_edge_nam
             f"bidirected edges named {bidirected_edge_name}."
         )
     union_xyz = x.union(y).union(z)
-    # get directed edges
-    G_copy = nx.DiGraph()
-    G_copy.add_nodes_from((n, deepcopy(d)) for n, d in G.nodes.items())
-    G_copy.graph = deepcopy(G.graph)
 
-    G_copy.add_edges_from(G.get_graphs(edge_type=directed_edge_name).edges)
+    # get directed edges
+    G_directed = nx.DiGraph()
+    G_directed.add_nodes_from((n, deepcopy(d)) for n, d in G.nodes.items())
+    G_directed.graph = deepcopy(G.graph)
+    G_directed.add_edges_from(G.get_graphs(edge_type=directed_edge_name).edges)
 
     # get bidirected edges subgraph
     G_bidirected = nx.Graph()
@@ -80,27 +80,25 @@ def m_separated(G, x, y, z, bidirected_edge_name="bidirected", directed_edge_nam
     # get ancestral subgraph of x | y | z by removing leaves in directed graph that are not in x | y | z
 
     # until no more leaves can be removed.
-    leaves = deque([n for n in G_copy.nodes if G_copy.out_degree[n] == 0])
+    leaves = deque([n for n in G_directed.nodes if G_directed.out_degree[n] == 0])
     while len(leaves) > 0:
         leaf = leaves.popleft()
         if leaf not in union_xyz:
-            for p in G_copy.predecessors(leaf):
-                if G_copy.out_degree[p] == 1:
+            for p in G_directed.predecessors(leaf):
+                if G_directed.out_degree[p] == 1:
                     leaves.append(p)
-            G_copy.remove_node(leaf)
+            G_directed.remove_node(leaf)
             G_bidirected.remove_node(leaf)
 
     # remove outgoing directed edges in z
-    edges_to_remove = list(G_copy.out_edges(z))
-    G_copy.remove_edges_from(edges_to_remove)
+    edges_to_remove = list(G_directed.out_edges(z))
+    G_directed.remove_edges_from(edges_to_remove)
 
     # make new undirected graph from remaining directed and bidirected edges
     G_final = nx.Graph()
     G_final.add_nodes_from((n, deepcopy(d)) for n, d in G_final.nodes.items())
-    G_final.add_edges_from(G_copy.edges)
+    G_final.add_edges_from(G_directed.edges)
     G_final.add_edges_from(G_bidirected.edges)
-
-    print(G_final.edges)
 
     disjoint_set = UnionFind(G_final.nodes())
     for component in nx.connected_components(G_final):
