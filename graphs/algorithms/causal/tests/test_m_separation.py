@@ -7,6 +7,7 @@ from graphs.algorithms.causal import m_separated
 
 def test_m_separation():
     digraph = nx.path_graph(4)
+    digraph.add_edge(2, 4)
     bigraph = nx.Graph([(2, 3)])
     bigraph.add_nodes_from(digraph)
     G = MixedEdgeGraph([digraph, bigraph], ["directed", "bidirected"])
@@ -23,3 +24,6 @@ def test_m_separation():
     # conditioning on a collider via bidirected edge opens the collider
     assert not m_separated(G, {0}, {3}, {2})
     assert m_separated(G, {0}, {3}, {1, 2})
+
+    # conditioning on a descendant of a collider via bidirected edge opens the collider
+    assert not m_separated(G, {0}, {3}, {4})
