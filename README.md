@@ -39,3 +39,6 @@ Minimally, graphs requires:
 To install the package from github, clone the repository and then `cd` into the directory:
 
     pip install -e .
+
+
+Minor update to documentation.
