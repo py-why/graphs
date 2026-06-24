@@ -36,7 +36,7 @@ classifiers = [
 dependencies = [
     'numpy >= 1.16.0',
     'scipy >= 1.2.0',
-    'networkx >= 2.8.3',
+    'networkx >= 3.4.2',
     'importlib-resources; python_version<"3.9"',
 ]
 
